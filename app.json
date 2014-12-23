@@ -1,0 +1,7 @@
+{
+    "name": "js-spot-the-difference",
+    "description": "Puzzle game written in JavaScript using streams.",
+    "repository": "https://github.com/widmogrod/js-spot-the-difference",
+    "logo": "http://node-js-sample.herokuapp.com/node.svg",
+    "keywords": ["node", "express", "static"]
+}

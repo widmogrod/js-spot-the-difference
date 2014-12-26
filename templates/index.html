@@ -2,7 +2,7 @@
 <html>
 <head lang="en">
     <meta charset="UTF-8">
-    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=2, minimal-ui">
+    <meta name="viewport" content="user-scalable=no, width=device-width, initial-scale=1, maximum-scale=1, minimal-ui">
     <title>Spot the difference - Puzzle game written in JavaScript using streams.</title>
     <link href="css/main.css" rel="stylesheet"/>
 </head>
@@ -10,7 +10,27 @@
 
 <div class="layout">
     <div class="component header">
-        <h1>Spot the difference</h1>
+        <h1>
+            Spot the difference
+            <span>Puzzle game written in JavaScript using streams.</span>
+        </h1>
+    </div>
+    <div class="component navigation">
+        <span class="differences">
+            <span class="found">0</span>
+            <span class="total">10</span>
+        </span>
+    </div>
+    <div class="component admin">
+        <input type="file" />
+        <input type="text" name="name" data-action="update-name" class="text" />
+        <button data-action="save" class="btn">Save</button>
+    </div>
+    <div class="component canvas">
+        <canvas id="game"></canvas>
+    </div>
+    <div class="component footer">
+        Love this painting? You can buy for $300 with free shipping. <a href="" class="btn buy">Buy painting</a>
     </div>
 </div>
 

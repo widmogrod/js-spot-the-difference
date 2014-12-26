@@ -1,4 +1,151 @@
+$line-height: 40px;
+$font-style: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
+
+$navigation-background-color: #c4c5c2;
+$navigation-box-shadow-color: #9e9d9b;
+$navigation-button-background-color: #a8a6aa;
+$navigation-button-color: #fff;
+
+$admin-background-color: #2ac56c;
+$admin-box-shadow-color: #119e4d;
+$admin-button-background-color: #17aa56;
+$admin-button-color: #fff;
+
+$footer-background-color: #9e54bd;
+$footer-box-shadow-color: #773793;
+$footer-button-background-color: #823aa0;
+$footer-button-color: #fff;
+
 /* Mobile first queries */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: $font-style;
+    margin: 0;
+
+}
+
+input,
+button {
+    margin: 0;
+    border: 0;
+    overflow: auto;
+    outline: none;
+    font: inherit;
+}
+
+h1 {
+    margin: 0;
+    font-size: 42px;
+    line-height: 52px;
+    > span {
+        font-size: 60%;
+    }
+}
+
+.component {
+    position: relative;
+    padding: 2em;
+    color: #fff;
+
+    > h1 {
+        color: rgb(137, 134, 126);
+        text-align: center;
+        font-weight: 300;
+        > span {
+            display: block;
+            opacity: 0.5;
+            padding: 0 0 0.6em 0.1em;
+        }
+    }
+}
+
+
+.btn,
+.text {
+    position: relative;
+    border-radius: 7px;
+    height: 30px;
+    box-shadow: 0 5px $admin-box-shadow-color;
+    padding: 5px 20px;
+    font-size: 14px;
+    line-height: 14px;
+}
+
+.btn {
+    background: $admin-button-background-color;
+    color: $admin-button-color;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 700;
+
+    &:hover {
+        box-shadow: 0 3px $admin-box-shadow-color;
+        top: 2px;
+    }
+    &:active {
+        box-shadow: none;
+        top: 5px;
+    }
+}
+
+
+.component {
+    &.admin {
+        background-color: $admin-background-color;
+        .btn,
+        .text {
+            box-shadow: 0 5px $admin-box-shadow-color;
+        }
+
+        .btn {
+            background: $admin-button-background-color;
+            &:hover {
+                box-shadow: 0 3px $admin-box-shadow-color;
+            }
+            &:active {
+                box-shadow: none;
+            }
+        }
+    }
+    &.navigation {
+        background-color: $navigation-background-color;
+        .btn,
+        .text {
+            box-shadow: 0 5px $navigation-box-shadow-color;
+        }
+
+        .btn {
+            background: $navigation-button-background-color;
+            &:hover {
+                box-shadow: 0 3px $navigation-box-shadow-color;
+            }
+            &:active {
+                box-shadow: none;
+            }
+        }
+    }
+    &.footer {
+        background-color: $footer-background-color;
+        .btn,
+        .text {
+            box-shadow: 0 5px $footer-box-shadow-color;
+        }
+
+        .btn {
+            background: $footer-button-background-color;
+            &:hover {
+                box-shadow: 0 3px $footer-box-shadow-color;
+            }
+            &:active {
+                box-shadow: none;
+            }
+        }
+    }
+}
+
 
 /* Larger than mobile */
 @media (min-width: 400px) {}

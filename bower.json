@@ -22,9 +22,9 @@
   ],
   "dependencies": {
     "requirejs": "~2",
-    "requirejs-plugins": "~1.0.2",
     "requirejs-text": "~2.0.12",
     "jquery": "~2.1.1",
-    "jef": " 2.0.0-alpha1"
+    "jef": " 2.0.0-alpha1",
+    "interact": "~1.1.3"
   }
 }

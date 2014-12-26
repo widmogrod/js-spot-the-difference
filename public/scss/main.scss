@@ -1,4 +1,5 @@
-$line-height: 40px;
+$line-height: 24px;
+$font-size: 16px;
 $font-style: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
 
 $navigation-background-color: #c4c5c2;
@@ -23,8 +24,9 @@ $footer-button-color: #fff;
 
 body {
     font-family: $font-style;
+    font-size: $font-size;
+    line-height: $line-height;
     margin: 0;
-
 }
 
 input,
@@ -50,6 +52,10 @@ h1 {
 h2 {
     font-size: 32px;
     line-height: 42px;
+}
+
+h1, h2, p, span, div {
+    line-height: 120%;
 }
 
 .component {
@@ -89,6 +95,7 @@ h2 {
     text-transform: uppercase;
     text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
     font-weight: 700;
+    white-space: nowrap;
 
     &:hover {
         box-shadow: 0 3px $admin-box-shadow-color;

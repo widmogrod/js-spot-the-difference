@@ -22,7 +22,8 @@ define([
     'jef/stream/fromPromise',
     'jef/stream/toArray',
     'jef/stream/push-stream',
-    'jef/stream/push-consume'
+    'jef/stream/push-consume',
+    './stream/fromElement'
 ], function(
     Stream,
     map,
@@ -47,7 +48,8 @@ define([
     fromPromise,
     toArray,
     PushStream,
-    consume
+    consume,
+    fromElement
 ) {
     'use strict';
 
@@ -93,12 +95,16 @@ define([
     Stream.prototype.toArray = function() {
         return toArray(this);
     };
+    Stream.prototype.flatMap = function(fn) {
+        return this.map(fn).concat();
+    };
 
     // Factories
     Stream.fromArray = fromArray;
     Stream.fromEmitter = fromEmitter;
     Stream.fromCallback = fromCallback;
     Stream.fromPromise = fromPromise;
+    Stream.fromElement = fromElement;
     Stream.both = both;
     Stream.when = when;
     Stream.noop = noop;

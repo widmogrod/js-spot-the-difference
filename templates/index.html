@@ -15,19 +15,33 @@
             <span>Puzzle game written in JavaScript using streams.</span>
         </h1>
     </div>
+    <div class="component admin">
+        <input type="file" data-action="upload"/>
+        <input type="text" name="name" data-action="update-name" class="text"/>
+        <button data-action="save" class="btn">Save</button>
+    </div>
+    <div class="component game">
+        <div id="js-image-main"></div>
+    </div>
     <div class="component navigation">
         <span class="differences">
             <span class="found">0</span>
             <span class="total">10</span>
         </span>
     </div>
-    <div class="component admin">
-        <input type="file" data-action="upload" />
-        <input type="text" name="name" data-action="update-name" class="text" />
-        <button data-action="save" class="btn">Save</button>
-    </div>
-    <div class="component game">
-        <div id="js-image-main"></div>
+    <div class="component differences">
+        <div class="difference">
+            <div class="thumb"></div>
+        </div>
+        <div class="difference">
+            <div class="thumb"></div>
+        </div>
+        <div class="difference">
+            <div class="thumb"></div>
+        </div>
+        <div class="difference">
+            <div class="thumb"></div>
+        </div>
     </div>
     <div class="component footer">
         <p>Love this painting? You can buy for $300 with free shipping. <a href="" class="btn buy">Buy painting</a></p>

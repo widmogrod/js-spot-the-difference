@@ -17,6 +17,11 @@ $footer-box-shadow-color: #773793;
 $footer-button-background-color: #823aa0;
 $footer-button-color: #fff;
 
+$difference-background-color: #4593e3;
+$difference-box-shadow-color: #326aa3;
+$difference-button-background-color: #3a7bbe;
+$difference-button-color: #fff;
+
 /* Mobile first queries */
 * {
     box-sizing: border-box;
@@ -163,11 +168,44 @@ a.btn {
             }
         }
     }
+    &.differences {
+        background-color: $difference-background-color;
+        .btn,
+        .text {
+            box-shadow: 0 5px $difference-box-shadow-color;
+        }
+
+        .btn {
+            background: $difference-button-background-color;
+            &:hover {
+                box-shadow: 0 3px $difference-box-shadow-color;
+            }
+            &:active {
+                box-shadow: none;
+            }
+        }
+    }
 }
 
 .component {
     &.game {
         padding: 0;
+    }
+}
+
+.component {
+    &.differences {
+        overflow: hidden;
+        .difference {
+            float: left;
+            width: 70px;
+            height: 70px;
+            border: 3px solid #fff;
+            margin-right: 10px;
+            margin-bottom: 10px;
+            border-radius: 7px;
+            box-shadow: 0 3px $difference-box-shadow-color;
+        }
     }
 }
 

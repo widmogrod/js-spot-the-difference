@@ -1,6 +1,7 @@
 $line-height: 24px;
 $font-size: 16px;
 $font-style: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
+$border-radius: 7px;
 
 $navigation-background-color: #c4c5c2;
 $navigation-box-shadow-color: #9e9d9b;
@@ -85,7 +86,7 @@ h1, h2, p, span, div {
 .btn,
 .text {
     position: relative;
-    border-radius: 7px;
+    border-radius: $border-radius;
     height: 30px;
     box-shadow: 0 5px $admin-box-shadow-color;
     padding: 5px 20px;
@@ -203,8 +204,16 @@ a.btn {
             border: 3px solid #fff;
             margin-right: 10px;
             margin-bottom: 10px;
-            border-radius: 7px;
-            box-shadow: 0 3px $difference-box-shadow-color;
+            border-radius: $border-radius;
+            box-shadow: 0 5px $difference-box-shadow-color;
+            .thumb {
+                &.empty {
+                    font-size: 40px;
+                    line-height: 70px;
+                    text-align: center;
+                    font-weight: bold;
+                }
+            }
         }
     }
 }

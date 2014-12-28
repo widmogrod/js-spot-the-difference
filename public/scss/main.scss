@@ -13,6 +13,11 @@ $admin-box-shadow-color: #119e4d;
 $admin-button-background-color: #17aa56;
 $admin-button-color: #fff;
 
+$game-background-color: #fcd04b;
+$game-box-shadow-color: #a38730;
+$game-button-background-color: #b99937;
+$game-button-color: #fff;
+
 $footer-background-color: #9e54bd;
 $footer-box-shadow-color: #773793;
 $footer-button-background-color: #823aa0;
@@ -117,6 +122,23 @@ a.btn {
     text-decoration: none;
 }
 
+.drop-box {
+    width: 90%;
+    min-height: 200px;
+    border: 7px dashed #c2c1c1;
+    border-radius: $border-radius;
+    margin: 50px auto;
+    color: #c1c1c1;
+    font-size: 40px;
+    text-align: center;
+    text-shadow: 0 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.draggable {
+    -webkit-transform: translate(0px, 0px);
+    transform: translate(0px, 0px);
+}
+
 .component {
     &.admin {
         background-color: $admin-background-color;
@@ -146,6 +168,23 @@ a.btn {
             background: $navigation-button-background-color;
             &:hover {
                 box-shadow: 0 3px $navigation-box-shadow-color;
+            }
+            &:active {
+                box-shadow: none;
+            }
+        }
+    }
+    &.game {
+        background-color: $game-background-color;
+        .btn,
+        .text {
+            box-shadow: 0 5px $game-box-shadow-color;
+        }
+
+        .btn {
+            background: $game-button-background-color;
+            &:hover {
+                box-shadow: 0 3px $game-box-shadow-color;
             }
             &:active {
                 box-shadow: none;
@@ -191,6 +230,27 @@ a.btn {
 .component {
     &.game {
         padding: 0;
+        .difference {
+            position: absolute;
+            width: 9%;
+            height: 9%;
+            border: 1px solid #fff;
+        }
+    }
+}
+
+.canvas {
+    position: absolute;
+    top: 0;
+    left:0;
+    right: 0;
+    bottom: 0;
+    z-index: 2;
+    .half {
+        position: relative;
+        float: left;
+        width: 50vw;
+        height: 50vw;
     }
 }
 

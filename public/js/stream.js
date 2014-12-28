@@ -12,7 +12,7 @@ define([
     'jef/stream/distinct',
     'jef/stream/debounce',
     'jef/stream/when',
-    'jef/stream/noop',
+    //'jef/stream/noop',
     'jef/stream/log',
     'jef/stream/last',
     'jef/stream/timeout',
@@ -38,7 +38,7 @@ define([
     distinct,
     debounce,
     when,
-    noop,
+    //noop,
     log,
     last,
     timeout,
@@ -107,7 +107,7 @@ define([
     Stream.fromElement = fromElement;
     Stream.both = both;
     Stream.when = when;
-    Stream.noop = noop;
+    //Stream.noop = noop;
     Stream.merge = merge;
     Stream.timeout = timeout;
 

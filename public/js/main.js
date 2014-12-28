@@ -1,12 +1,19 @@
 require.config({
     name: 'main',
     paths: {
+        jef: '../vendor/jef/src',
         text: '../vendor/requirejs-text/text',
-        jef: '../vendor/jef/src'
+        interact: '../vendor/interact/interact.min'
     }
 });
 
-define(['./selector', './stream', './config'], function (selector, Stream, config) {
+define([
+    './config',
+    './stream',
+    './dom/selector',
+    './dom/position',
+    './utils/between'
+], function (config, Stream, selector, position, between) {
     'use strict';
 
     var upload = Stream.fromEmitter(selector(document), '[data-action="upload"]', 'change');
@@ -38,14 +45,41 @@ define(['./selector', './stream', './config'], function (selector, Stream, confi
         image.style.width = '100%';
 
         return stream;
-    }).map(function(event) {
+    }).map(function (event) {
         return event.path[0];
     });
 
     var thumb = thumbs.take(1);
-
-    thumb.on(function(el) {
-        document.getElementById('js-image-main').appendChild(el);
+    thumb.on(function () {
+        document.getElementById('js-image-main')
     });
 
+    var draggable = Stream.fromEmitter(selector(document), '[draggable="true"]', 'dragend')
+        .map(function(e) {
+            var el = e.target,
+                target = {
+                    element: el,
+                    width: el.offsetWidth,
+                    height: el.offsetHeight
+                },
+                elParent = el.parentNode,
+                parent = {
+                    width: elParent.offsetWidth,
+                    height: elParent.offsetHeight,
+                    position: position(elParent)
+                };
+
+            return {
+                x: between(e.clientX - parent.position.x, 0, parent.width - target.width),
+                y: between(e.clientY - parent.position.y - target.height, 0, parent.height - target.height),
+                target: target,
+                parent: parent
+            }
+        });
+
+    draggable.on(function (e) {
+        var target = e.target.element;
+        target.style.left = (e.x / e.parent.width * 100) + '%';
+        target.style.top = (e.y / e.parent.width * 100) + '%';
+    });
 });

@@ -98,6 +98,19 @@ define([
     Stream.prototype.flatMap = function(fn) {
         return this.map(fn).concat();
     };
+    Stream.prototype.toElementValue = function(element) {
+        return this.on(function(value) {
+            element.value = value;
+        });
+    };
+    Stream.prototype.toElementHtml = function(element) {
+        return this.on(function(value) {
+            element.innerHTML = value;
+        });
+    };
+    Stream.prototype.template = function(template) {
+        return this.map(template);
+    };
 
     // Factories
     Stream.fromArray = fromArray;

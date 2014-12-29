@@ -234,7 +234,15 @@ a.btn {
             position: absolute;
             width: 9%;
             height: 9%;
-            border: 1px solid #fff;
+            border: 3px solid #fff;
+            cursor: move;
+            box-shadow: 0 2px rgba(0, 0, 0, 0.3);
+            transform: rotateX(0);
+            &.phantom {
+                cursor: default;
+                border-color: #bababa;
+                background-color: rgba(0, 0, 0, 0.3);
+            }
         }
     }
 }

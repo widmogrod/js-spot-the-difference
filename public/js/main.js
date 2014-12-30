@@ -17,16 +17,30 @@ define([
 ], function (config, Stream, selector, position, between, merge) {
     'use strict';
 
-    var state = {
+    var canvas = document.getElementById('js-image-main');
+
+    var board = {
+        id: 1,
         name: "Sisters",
         diffs: [
             {
+                id: 1,
                 x: 0,
                 y: 0,
                 name: 'New one',
                 description: "Something interesting"
             }
         ]
+    };
+
+    var game = {
+        boards: [
+            board
+        ],
+        indices: {
+            board: 1,
+            diff: 1
+        }
     };
 
     var stateStream = new Stream.Push().distinct();
@@ -41,13 +55,13 @@ define([
     var upload = Stream.fromEmitter(selector(document), '[data-action="upload"]', 'change');
 
     createDiff.on(function () {
-        state.diffs.push({
+        board.diffs.push({
             x: 0,
             y: 0,
             name: "New one 2",
             description: "Awesome"
         });
-        stateStream.push(state);
+        stateStream.push(board);
     });
 
     stateStream.map(function (state) {
@@ -61,8 +75,8 @@ define([
     }).template(function (diffs) {
         var result = '';
         diffs.forEach(function () {
-            result += '<div class="difference"> \
-                        <div class="thumb empty">?</div> \
+            result += '<div class="difference tile"> \
+                        <canvas id="js-diff-1"></canvas>\
                     </div>';
         });
 
@@ -74,15 +88,14 @@ define([
     Stream.when([
         updateName,
         stateStreamLast
-    ]).log('when')
-        .on(function (data) {
-            var name = data[0],
-                state = data[1];
+    ]).on(function (data) {
+        var name = data[0],
+            state = data[1];
 
-            state.name = name;
-        }).log('when');
+        state.name = name;
+    }).log('when');
 
-    stateStream.push(state);
+    stateStream.push(board);
 
     var files = upload.map(function (e) {
         return e.target
@@ -116,10 +129,14 @@ define([
     });
 
     var thumb = thumbs.take(1);
-    thumb.on(function () {
-        document.getElementById('js-image-main')
+    thumb.on(function (image) {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        var context = canvas.getContext("2d");
+        context.drawImage(image, 0, 0);
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
     });
-
 
     function mapElementPosition(e) {
         var elTarget = e.target,
@@ -134,28 +151,58 @@ define([
                 width: elParent.offsetWidth,
                 height: elParent.offsetHeight,
                 position: position(elParent)
-            };
-
-        return {
-            x: between(
+            },
+            x = between(
                 e.clientX - parent.position.x,
                 0,
                 parent.width - target.width
             ),
-            y: between(
+            y = between(
                 e.clientY - parent.position.y - target.height,
                 0,
                 parent.height - target.height
-            ),
+            );
+
+        return {
+            position: {
+                x: x,
+                y: y
+            },
+            percent: {
+                left: x / parent.width * 100,
+                top: y / parent.height * 100
+            },
             target: target,
             parent: parent
         }
     }
 
+    function drawThumb(data) {
+        var x = canvas.width/2 * data.percent.left / 100 >> 0;
+        var y = canvas.height * data.percent.top / 100 >> 0;
+
+        var width = canvas.width/2 * (data.target.width/data.parent.width) >> 0;
+        var height = canvas.height * (data.target.height/data.parent.height) >> 0;
+
+        var context = canvas.getContext('2d'),
+            imageData = context.getImageData(
+                x, y,
+                width,
+                height
+            );
+        var thumb = document.getElementById('js-diff-1');
+        thumb.width = width;
+        thumb.height = height;
+        thumb.style.width = '100%';
+
+        var thumbContext = thumb.getContext("2d");
+        thumbContext.putImageData(imageData, 0, 0);
+    }
+
     function setRelativePosition(e) {
         var target = e.target.element;
-        target.style.left = (e.x / e.parent.width * 100) + '%';
-        target.style.top = (e.y / e.parent.width * 100) + '%';
+        target.style.left = e.percent.left + '%';
+        target.style.top = e.percent.top + '%';
     }
 
     function toPhantom(element) {
@@ -180,4 +227,6 @@ define([
 
     draggableEnd.on(setRelativePosition);
     phantom.on(setRelativePosition);
+
+    draggableEnd.merge(draggableDrag).on(drawThumb);
 });

@@ -1,7 +1,12 @@
 $line-height: 24px;
 $font-size: 16px;
 $font-style: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
+
 $border-radius: 7px;
+
+$thumb-width: 70px;
+$thumb-height: 70px;
+$thumb-border-size: 3px;
 
 $navigation-background-color: #c4c5c2;
 $navigation-box-shadow-color: #9e9d9b;
@@ -234,7 +239,7 @@ a.btn {
             position: absolute;
             width: 9%;
             height: 9%;
-            border: 3px solid #fff;
+            border: $thumb-border-size solid #fff;
             cursor: move;
             box-shadow: 0 2px rgba(0, 0, 0, 0.3);
             transform: rotateX(0);
@@ -262,16 +267,29 @@ a.btn {
     }
 }
 
+.tile {
+    width: $thumb-width;
+    height: $thumb-height;
+    &.btn {
+        line-height: $thumb-height;
+        font-size: $thumb-height/2;
+        padding: 0;
+    }
+}
+
 .component {
     &.differences {
         overflow: hidden;
-        .difference {
+
+        .difference,
+        .btn {
             float: left;
-            width: 70px;
-            height: 70px;
-            border: 3px solid #fff;
             margin-right: 10px;
             margin-bottom: 10px;
+        }
+
+        .difference {
+            border: 3px solid #fff;
             border-radius: $border-radius;
             box-shadow: 0 5px $difference-box-shadow-color;
             .thumb {

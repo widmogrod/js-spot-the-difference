@@ -108,8 +108,22 @@ define([
             element.innerHTML = value;
         });
     };
-    Stream.prototype.template = function(template) {
-        return this.map(template);
+    Stream.prototype.pluck = function(pattern) {
+        var path = pattern.split('.'), undefined;
+        return this.map(function(value) {
+            return path.reduce(function(base, key) {
+                return undefined === base
+                    ? base
+                    : (base.hasOwnProperty(key)
+                        ? base[key]
+                        : undefined);
+            }, value);
+        });
+    };
+    Stream.prototype.filterUndefined = function(undefined) {
+        return this.filter(function(value) {
+            return value !== undefined
+        })
     };
 
     // Factories

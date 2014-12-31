@@ -17,17 +17,17 @@ define([
     './utils/onDragSetTargetPosition',
     './utils/onDragDrawThumb',
     './utils/onDragMovePhantom'
-], function (
-    config, Stream, eventEmitter, position, between,
-    mapDropEventToPosition,
-    onDragSetTargetPosition,
-    onDragDrawThumb,
-    onDragMovePhantom
-) {
+], function (config, Stream, eventEmitter, position, between,
+             mapDropEventToPosition,
+             onDragSetTargetPosition,
+             onDragDrawThumb,
+             onDragMovePhantom) {
     'use strict';
 
     // Const?
     var canvas = document.getElementById('js-image-main');
+    var diffsContainer = document.getElementById('js-diffs');
+    var documentEmitter = eventEmitter(document);
 
     var board = {
         id: 1,
@@ -53,15 +53,13 @@ define([
         }
     };
 
-    var documentEmitter = eventEmitter(document);
 
     var stateStream = new Stream.Push().distinct();
     var stateStreamLast = stateStream.last();
 
-    var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup')
-        .map(function (e) {
-            return e.target.value;
-        }).distinct();
+    var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').map(function (e) {
+        return e.target.value
+    }).distinct();
 
     var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
     var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
@@ -85,7 +83,7 @@ define([
 
     stateStream.map(function (state) {
         return state.diffs;
-    }).template(function (diffs) {
+    }).map(function (diffs) {
         var result = '';
         diffs.forEach(function (diff) {
             result += '<div class="difference tile"> \
@@ -94,9 +92,7 @@ define([
         });
 
         return result;
-    }).toElementHtml(
-        document.getElementById('js-diffs')
-    );
+    }).toElementHtml(diffsContainer);
 
     Stream.when([
         updateNameStream,
@@ -110,6 +106,9 @@ define([
 
     stateStream.push(board);
 
+    //stateStream.pluck('diffs.length').log('pluck ok');
+    //stateStream.pluck('diffs.length2').log('pluck und');
+
     var uploadedFilesStream = uploadStream.map(function (e) {
         return e.target
     }).filter(function (el) {
@@ -119,7 +118,6 @@ define([
     }).filter(function (file) {
         return config.acceptedTypes[file.type];
     });
-
     var thumbsStream = uploadedFilesStream.flatMap(function (file) {
         var reader = new FileReader();
         var stream = Stream.fromElement(reader);
@@ -148,7 +146,6 @@ define([
         canvas.style.width = '100%';
         canvas.style.height = 'auto';
     });
-
 
     // On vent
     var drawThumb = onDragDrawThumb(canvas, document.getElementById('js-diff-1'));

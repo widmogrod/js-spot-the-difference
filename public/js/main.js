@@ -11,13 +11,11 @@ define([
     './config',
     './stream',
     './dom/eventEmitter',
-    './dom/position',
-    './utils/between',
     './utils/mapDropEventToPosition',
     './utils/onDragSetTargetPosition',
     './utils/onDragDrawThumb',
     './utils/onDragMovePhantom'
-], function (config, Stream, eventEmitter, position, between,
+], function (config, Stream, eventEmitter,
              mapDropEventToPosition,
              onDragSetTargetPosition,
              onDragDrawThumb,
@@ -44,16 +42,15 @@ define([
         ]
     };
 
-    var game = {
-        boards: [
-            board
-        ],
-        indices: {
-            board: 1,
-            diff: 1
-        }
-    };
-
+    //var game = {
+    //    boards: [
+    //        board
+    //    ],
+    //    indices: {
+    //        board: 1,
+    //        diff: 1
+    //    }
+    //};
 
     var stateStream = new Stream.Push().distinct();
     var stateStreamLast = stateStream.last();

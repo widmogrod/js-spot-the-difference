@@ -25,8 +25,9 @@ define([
     'use strict';
 
     // Const?
-    var canvas = document.getElementById('js-image-main');
-    var diffsContainer = document.getElementById('js-diffs');
+    var elCanvas = document.getElementById('js-image-main');
+    var elBoardName = document.getElementById('js-name');
+    var elDiffsContainer = document.getElementById('js-diffs');
     var documentEmitter = eventEmitter(document);
 
     var board = {
@@ -57,10 +58,7 @@ define([
     var stateStream = new Stream.Push().distinct();
     var stateStreamLast = stateStream.last();
 
-    var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').map(function (e) {
-        return e.target.value
-    }).distinct();
-
+    var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').pluck('target.value').distinct();
     var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
     var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
 
@@ -75,15 +73,9 @@ define([
         stateStream.push(board);
     });
 
-    stateStream.map(function (state) {
-        return state.name;
-    }).distinct().toElementValue(
-        document.getElementById('js-name')
-    );
-
-    stateStream.map(function (state) {
-        return state.diffs;
-    }).map(function (diffs) {
+    // Update DOM
+    stateStream.pluck('name').distinct().toElementValue(elBoardName);
+    stateStream.pluck('diffs').map(function (diffs) {
         var result = '';
         diffs.forEach(function (diff) {
             result += '<div class="difference tile"> \
@@ -92,7 +84,7 @@ define([
         });
 
         return result;
-    }).toElementHtml(diffsContainer);
+    }).toElementHtml(elDiffsContainer);
 
     Stream.when([
         updateNameStream,
@@ -105,9 +97,6 @@ define([
     }).log('when');
 
     stateStream.push(board);
-
-    //stateStream.pluck('diffs.length').log('pluck ok');
-    //stateStream.pluck('diffs.length2').log('pluck und');
 
     var uploadedFilesStream = uploadStream.map(function (e) {
         return e.target
@@ -139,16 +128,16 @@ define([
 
     var firstThumbStream = thumbsStream.take(1);
     firstThumbStream.on(function (image) {
-        canvas.width = image.width;
-        canvas.height = image.height;
-        var context = canvas.getContext("2d");
+        elCanvas.width = image.width;
+        elCanvas.height = image.height;
+        var context = elCanvas.getContext("2d");
         context.drawImage(image, 0, 0);
-        canvas.style.width = '100%';
-        canvas.style.height = 'auto';
+        elCanvas.style.width = '100%';
+        elCanvas.style.height = 'auto';
     });
 
     // On vent
-    var drawThumb = onDragDrawThumb(canvas, document.getElementById('js-diff-1'));
+    var drawThumb = onDragDrawThumb(elCanvas, document.getElementById('js-diff-1'));
     var mapPhantom = onDragMovePhantom(document.getElementById('js-phantom-difference'));
 
     var draggableEndStream = Stream.fromEmitter(documentEmitter, '[draggable="true"]', 'dragend').map(mapDropEventToPosition);

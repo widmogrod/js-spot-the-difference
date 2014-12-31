@@ -1,21 +1,21 @@
-/*Global:Element*/
 define(function () {
     'use strict';
-    
-    var elementProto = Element.prototype;
-    var matchesSelector = elementProto.mozMatchesSelector
-        || elementProto.webkitMatchesSelector
-        || elementProto.oMatchesSelector
-        || elementProto.msMatchesSelector;
 
-    return function selector(element) {
+    return function selector(selector, scope) {
+        var element = scope ? scope : document,
+            list = element.querySelectorAll(selector),
+            length = list.length;
+
         return {
-            on: function on(event, selector, fn) {
-                element.addEventListener(event, function(e) {
-                    if (matchesSelector.call(e.target, selector)) {
-                        fn.call(e.target, e);
-                    }
-                }, false);
+            each: function(fn) {
+                for(var i = 0; i < length; i++) {
+                    fn(this.get(i));
+                }
+
+                return this;
+            },
+            get: function(index) {
+                return arguments.length ? list[index] : list;
             }
         }
     }

@@ -10,13 +10,23 @@ require.config({
 define([
     './config',
     './stream',
-    './dom/selector',
+    './dom/eventEmitter',
     './dom/position',
     './utils/between',
-    'jef/functional/merge'
-], function (config, Stream, selector, position, between, merge) {
+    './utils/mapDropEventToPosition',
+    './utils/onDragSetTargetPosition',
+    './utils/onDragDrawThumb',
+    './utils/onDragMovePhantom'
+], function (
+    config, Stream, eventEmitter, position, between,
+    mapDropEventToPosition,
+    onDragSetTargetPosition,
+    onDragDrawThumb,
+    onDragMovePhantom
+) {
     'use strict';
 
+    // Const?
     var canvas = document.getElementById('js-image-main');
 
     var board = {
@@ -43,19 +53,22 @@ define([
         }
     };
 
+    var documentEmitter = eventEmitter(document);
+
     var stateStream = new Stream.Push().distinct();
     var stateStreamLast = stateStream.last();
 
-    var updateName = Stream.fromEmitter(selector(document), '[data-action="update-name"]', 'keyup')
+    var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup')
         .map(function (e) {
             return e.target.value;
         }).distinct();
 
-    var createDiff = Stream.fromEmitter(selector(document), '[data-action="add-diff"]', 'click');
-    var upload = Stream.fromEmitter(selector(document), '[data-action="upload"]', 'change');
+    var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
+    var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
 
-    createDiff.on(function () {
+    addDiffStream.on(function () {
         board.diffs.push({
+            id: board.diffs.length + 1,
             x: 0,
             y: 0,
             name: "New one 2",
@@ -74,9 +87,9 @@ define([
         return state.diffs;
     }).template(function (diffs) {
         var result = '';
-        diffs.forEach(function () {
+        diffs.forEach(function (diff) {
             result += '<div class="difference tile"> \
-                        <canvas id="js-diff-1"></canvas>\
+                        <canvas id="js-diff-' + diff.id + '"></canvas>\
                     </div>';
         });
 
@@ -86,7 +99,7 @@ define([
     );
 
     Stream.when([
-        updateName,
+        updateNameStream,
         stateStreamLast
     ]).on(function (data) {
         var name = data[0],
@@ -97,7 +110,7 @@ define([
 
     stateStream.push(board);
 
-    var files = upload.map(function (e) {
+    var uploadedFilesStream = uploadStream.map(function (e) {
         return e.target
     }).filter(function (el) {
         return el.files.length;
@@ -107,9 +120,7 @@ define([
         return config.acceptedTypes[file.type];
     });
 
-    files.log('files');
-
-    var thumbs = files.flatMap(function (file) {
+    var thumbsStream = uploadedFilesStream.flatMap(function (file) {
         var reader = new FileReader();
         var stream = Stream.fromElement(reader);
 
@@ -128,8 +139,8 @@ define([
         return event.path[0];
     });
 
-    var thumb = thumbs.take(1);
-    thumb.on(function (image) {
+    var firstThumbStream = thumbsStream.take(1);
+    firstThumbStream.on(function (image) {
         canvas.width = image.width;
         canvas.height = image.height;
         var context = canvas.getContext("2d");
@@ -138,95 +149,17 @@ define([
         canvas.style.height = 'auto';
     });
 
-    function mapElementPosition(e) {
-        var elTarget = e.target,
-            target = {
-                element: elTarget,
-                width: elTarget.offsetWidth,
-                height: elTarget.offsetHeight,
-                position: position(elTarget)
-            },
-            elParent = elTarget.parentNode,
-            parent = {
-                width: elParent.offsetWidth,
-                height: elParent.offsetHeight,
-                position: position(elParent)
-            },
-            x = between(
-                e.clientX - parent.position.x,
-                0,
-                parent.width - target.width
-            ),
-            y = between(
-                e.clientY - parent.position.y - target.height,
-                0,
-                parent.height - target.height
-            );
 
-        return {
-            position: {
-                x: x,
-                y: y
-            },
-            percent: {
-                left: x / parent.width * 100,
-                top: y / parent.height * 100
-            },
-            target: target,
-            parent: parent
-        }
-    }
+    // On vent
+    var drawThumb = onDragDrawThumb(canvas, document.getElementById('js-diff-1'));
+    var mapPhantom = onDragMovePhantom(document.getElementById('js-phantom-difference'));
 
-    function drawThumb(data) {
-        var x = canvas.width/2 * data.percent.left / 100 >> 0;
-        var y = canvas.height * data.percent.top / 100 >> 0;
+    var draggableEndStream = Stream.fromEmitter(documentEmitter, '[draggable="true"]', 'dragend').map(mapDropEventToPosition);
+    var draggableDragStream = Stream.fromEmitter(documentEmitter, '[draggable="true"]', 'drag').map(mapDropEventToPosition);
+    var draggableAllStream = draggableEndStream.merge(draggableDragStream);
+    var movePhantomOnDragStream = draggableAllStream.map(mapPhantom);
 
-        var width = canvas.width/2 * (data.target.width/data.parent.width) >> 0;
-        var height = canvas.height * (data.target.height/data.parent.height) >> 0;
-
-        var context = canvas.getContext('2d'),
-            imageData = context.getImageData(
-                x, y,
-                width,
-                height
-            );
-        var thumb = document.getElementById('js-diff-1');
-        thumb.width = width;
-        thumb.height = height;
-        thumb.style.width = '100%';
-
-        var thumbContext = thumb.getContext("2d");
-        thumbContext.putImageData(imageData, 0, 0);
-    }
-
-    function setRelativePosition(e) {
-        var target = e.target.element;
-        target.style.left = e.percent.left + '%';
-        target.style.top = e.percent.top + '%';
-    }
-
-    function toPhantom(element) {
-        return function mapPhantom(e) {
-            return merge(e, {
-                target: {
-                    element: element
-                }
-            });
-        }
-    }
-
-    var mapPhantom = toPhantom(
-        document.getElementById('js-phantom-difference')
-    );
-
-    var draggableEnd = Stream.fromEmitter(selector(document), '[draggable="true"]', 'dragend').map(mapElementPosition);
-    var draggableDrag = Stream.fromEmitter(selector(document), '[draggable="true"]', 'drag').map(mapElementPosition);
-
-    var phantom = draggableEnd.map(mapPhantom)
-        .merge(draggableDrag.map(mapPhantom));
-
-    draggableEnd.on(setRelativePosition);
-    phantom.on(setRelativePosition);
-
-    draggableEnd.merge(draggableDrag).on(drawThumb);
+    draggableEndStream.on(onDragSetTargetPosition);
+    movePhantomOnDragStream.on(onDragSetTargetPosition);
+    draggableAllStream.on(drawThumb);
 });

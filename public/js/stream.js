@@ -23,7 +23,8 @@ define([
     'jef/stream/toArray',
     'jef/stream/push-stream',
     'jef/stream/push-consume',
-    './stream/fromElement'
+    './stream/fromElement',
+    './stream/domDiffWith'
 ], function(
     Stream,
     map,
@@ -49,7 +50,8 @@ define([
     toArray,
     PushStream,
     consume,
-    fromElement
+    fromElement,
+    domDiffWith
 ) {
     'use strict';
 
@@ -103,10 +105,8 @@ define([
             element.value = value;
         });
     };
-    Stream.prototype.toElementHtml = function(element) {
-        return this.on(function(value) {
-            element.innerHTML = value;
-        });
+    Stream.prototype.domDiffWith = function(element) {
+        return domDiffWith(this, element);
     };
     Stream.prototype.pluck = function(pattern) {
         var path = pattern.split('.'), undefined;
@@ -120,11 +120,11 @@ define([
             }, value);
         });
     };
-    Stream.prototype.filterUndefined = function(undefined) {
-        return this.filter(function(value) {
-            return value !== undefined
-        })
-    };
+    //Stream.prototype.filterUndefined = function(undefined) {
+    //    return this.filter(function(value) {
+    //        return value !== undefined
+    //    })
+    //};
 
     // Factories
     Stream.fromArray = fromArray;

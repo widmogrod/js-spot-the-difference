@@ -23,21 +23,21 @@
     <div class="component game">
         <!--<div class="drop-box">Drop image here</div>-->
         <div class="canvas">
-            <div class="half">
-                <div class="difference" draggable="true"></div>
+            <div class="half" id="js-first-half-preview">
+                <!--<div class="difference" draggable="true"></div>-->
             </div>
-            <div class="half">
-                <div class="difference phantom" id="js-phantom-difference"></div>
+            <div class="half" id="js-second-half-preview">
+                <!--<div class="difference phantom" id="js-phantom-difference"></div>-->
             </div>
         </div>
         <canvas id="js-image-main"></canvas>
     </div>
-    <div class="component navigation">
-        <span class="differences">
-            <span class="found">0</span>
-            <span class="total">10</span>
-        </span>
-    </div>
+    <!--<div class="component navigation">-->
+        <!--<span class="differences">-->
+            <!--<span class="found">0</span>-->
+            <!--<span class="total">10</span>-->
+        <!--</span>-->
+    <!--</div>-->
     <div class="component differences">
         <button data-action="add-diff" class="btn tile">+</button>
         <div id="js-diffs"></div>

@@ -100,6 +100,16 @@ define([
     Stream.prototype.flatMap = function(fn) {
         return this.map(fn).concat();
     };
+    Stream.prototype.apply = function(fn, thisArg) {
+        return this.map(function(value) {
+            return fn.apply(thisArg, value);
+        });
+    };
+    Stream.prototype.onApply = function(fn, thisArg) {
+        return this.on(function(value) {
+            fn.apply(thisArg, value);
+        });
+    };
     Stream.prototype.toElementValue = function(element) {
         return this.on(function(value) {
             element.value = value;

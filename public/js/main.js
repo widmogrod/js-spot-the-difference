@@ -112,10 +112,7 @@ define([
     Stream.when([
         updateNameStream,
         stateStreamLast
-    ]).on(function (data) {
-        var name = data[0],
-            state = data[1];
-
+    ]).onApply(function (name, state) {
         state.name = name;
     }).log('when');
 
@@ -176,10 +173,7 @@ define([
     var draggableThumbSizeStream = Stream.when([
         draggableAllStream,
         firstThumbStream
-    ]).map(function(data) {
-        var event = data[0],
-            elCanvas = data[1];
-
+    ]).apply(function(event, elCanvas) {
         return mapThumbDimensionForCanvas(
             elCanvas.width,
             elCanvas.height
@@ -189,10 +183,7 @@ define([
     Stream.when([
         draggableThumbSizeStream,
         draggableThumbSizeStream.map(mapThumbToImageData(elCanvas))
-    ]).on(function(data){
-        var imageData = data[1],
-            data = data[0];
-
+    ]).onApply(function(data, imageData){
         var thumbCanvas = document.querySelector('canvas[data-id="'+ data.id +'"]');
         thumbCanvas.width = data.width;
         thumbCanvas.height = data.height;
@@ -204,12 +195,8 @@ define([
     Stream.when([
         stateStream.pluck('diffs'),
         draggableEndStream
-    ]).on(function(data) {
-        var diffs = data[0],
-            e = data[1];
-
+    ]).onApply(function(diffs, e) {
         var id = parseInt(e.target.element.getAttribute('data-id'));
-
         var thumbCanvas = document.querySelector('canvas[data-id="'+ id +'"]');
 
         diffs.filter(function(diff) {

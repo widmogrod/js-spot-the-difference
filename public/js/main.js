@@ -20,18 +20,20 @@ define([
     './utils/loadImageIntoCanvas',
     './views/differenceTails',
     './views/differenceThumbs'
-], function (config,
-             Stream,
-             eventEmitter,
-             mapDropEventToPosition,
-             mapThumbDimensionForCanvas,
-             mapCanvasSelectedPartToImageData,
-             onDragSetTargetPosition,
-             onDragDrawThumb,
-             onDragMovePhantom,
-             loadImageIntoCanvas,
-             differenceTails,
-             differenceThumbs) {
+], function (
+    config,
+    Stream,
+    eventEmitter,
+    mapDropEventToPosition,
+    mapThumbDimensionForCanvas,
+    mapCanvasSelectedPartToImageData,
+    onDragSetTargetPosition,
+    onDragDrawThumb,
+    onDragMovePhantom,
+    loadImageIntoCanvas,
+    differenceTails,
+    differenceThumbs
+) {
     'use strict';
 
     var documentEmitter = eventEmitter(document);
@@ -81,7 +83,7 @@ define([
     stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
 
     updateNameStream.on(function (name) {
-        boardStateLastStream.on(function(board) {
+        boardStateLastStream.on(function (board) {
             board.name = name;
             boardStateStream.push(board);
         })

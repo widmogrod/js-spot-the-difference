@@ -175,7 +175,7 @@ define([
     });
 
     Stream.when([
-        stateStream.pluck('diffs'),
+        stateDiffsStream,
         draggableEndStream
     ]).onApply(function(diffs, e) {
         var id = parseInt(e.target.element.getAttribute('data-id'));

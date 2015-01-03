@@ -17,6 +17,7 @@ define([
     './utils/onDragSetTargetPosition',
     './utils/onDragDrawThumb',
     './utils/onDragMovePhantom',
+    './utils/loadImageIntoCanvas',
     './views/differenceTails',
     './views/differenceThumb'
 ], function (
@@ -29,6 +30,7 @@ define([
     onDragSetTargetPosition,
     onDragDrawThumb,
     onDragMovePhantom,
+    loadImageIntoCanvas,
     differenceTails,
     differenceThumb
 ) {
@@ -137,16 +139,9 @@ define([
     });
 
     Stream.when([
-        canvasStream,
-        firstImageStream
-    ]).onApply(function(canvas, image) {
-        canvas.width = image.width;
-        canvas.height = image.height;
-        var context = canvas.getContext("2d");
-        context.drawImage(image, 0, 0);
-        canvas.style.width = '100%';
-        canvas.style.height = 'auto';
-    });
+        firstImageStream,
+        canvasStream
+    ]).onApply(loadImageIntoCanvas);
 
     // On vent
     var mapPhantom = onDragMovePhantom(document.getElementById('js-phantom-difference'));
@@ -164,12 +159,12 @@ define([
     var draggableThumbSizeStream = Stream.when([
         firstImageDimensionStream,
         draggableAllStream
-    ]).apply(mapThumbDimensionForCanvas);
+    ]).mapApply(mapThumbDimensionForCanvas);
 
     var imageDataStream = Stream.when([
         canvasStream,
         draggableThumbSizeStream
-    ]).apply(mapCanvasSelectedPartToImageData);
+    ]).mapApply(mapCanvasSelectedPartToImageData);
 
     Stream.when([
         draggableThumbSizeStream,

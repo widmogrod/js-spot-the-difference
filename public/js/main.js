@@ -19,7 +19,7 @@ define([
     './utils/onDragMovePhantom',
     './utils/loadImageIntoCanvas',
     './views/differenceTails',
-    './views/differenceThumb'
+    './views/differenceThumbs'
 ], function (
     config,
     Stream,
@@ -32,7 +32,7 @@ define([
     onDragMovePhantom,
     loadImageIntoCanvas,
     differenceTails,
-    differenceThumb
+    differenceThumbs
 ) {
     'use strict';
 
@@ -85,7 +85,7 @@ define([
     stateStream.pluck('name').distinct().toElementProp('#js-name', 'value');
 
     var stateDiffsStream =  stateStream.pluck('diffs');
-    stateDiffsStream.map(differenceThumb).domDiffWith('#js-diffs');
+    stateDiffsStream.map(differenceThumbs).domDiffWith('#js-diffs');
     stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
 
     Stream.when([

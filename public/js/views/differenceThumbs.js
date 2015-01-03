@@ -1,7 +1,7 @@
 define(['../dom/el'], function (el) {
     'use strict';
 
-    return function differenceThumb(diffs) {
+    return function differenceThumbs(diffs) {
         return diffs.map(function (diff) {
             return el('div', {class: 'difference tile'}, [
                 el('canvas', {

@@ -47,18 +47,7 @@ define([
         diffs: []
     };
 
-    var game = {
-        boards: [
-            board
-        ],
-        indices: {
-            board: 1,
-            diff: 1
-        }
-    };
-
     var stateStream = new Stream.Push().distinct();
-    var stateStreamLast = stateStream.last();
 
     var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').pluck('target.value').distinct();
     var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
@@ -88,12 +77,10 @@ define([
     stateDiffsStream.map(differenceThumbs).domDiffWith('#js-diffs');
     stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
 
-    Stream.when([
-        updateNameStream,
-        stateStreamLast
-    ]).onApply(function (name, state) {
-        state.name = name;
-    }).log('when');
+    updateNameStream.on(function (name) {
+        board.name = name;
+        stateStream.push(board);
+    });
 
     stateStream.push(board);
 

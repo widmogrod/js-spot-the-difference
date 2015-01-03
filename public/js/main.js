@@ -147,6 +147,12 @@ define([
     });
 
     var firstThumbStream = thumbsStream.take(1);
+    var firstThumbDimensionStream = firstThumbStream.map(function(elCanvas) {
+        return {
+            width: elCanvas.width,
+            height: elCanvas.height
+        }
+    });
     firstThumbStream.on(function (image) {
         elCanvas.width = image.width;
         elCanvas.height = image.height;
@@ -171,14 +177,9 @@ define([
     //var draggableThumbSizeStream = draggableAllStream.map();
 
     var draggableThumbSizeStream = Stream.when([
-        draggableAllStream,
-        firstThumbStream
-    ]).apply(function(event, elCanvas) {
-        return mapThumbDimensionForCanvas(
-            elCanvas.width,
-            elCanvas.height
-        )(event);
-    });
+        firstThumbDimensionStream,
+        draggableAllStream
+    ]).apply(mapThumbDimensionForCanvas);
 
     Stream.when([
         draggableThumbSizeStream,

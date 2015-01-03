@@ -1,0 +1,25 @@
+{
+  "boss": true,
+  "curly": true,
+  "eqeqeq": true,
+  "eqnull": true,
+  "expr": true,
+  "immed": true,
+  "noarg": true,
+  "newcap": true,
+  "noarg": true,
+  "onevar": false,
+  "laxbreak": true,
+  "laxcomma": true,
+  "lastsemic": true,
+  "quotmark": "single",
+  "trailing": true,
+  "undef": true,
+  "unused": true,
+  "browser": true,
+  "strict": true,
+  "globals": {
+    "define": false,
+    "require": false
+  }
+}

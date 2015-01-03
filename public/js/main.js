@@ -45,7 +45,7 @@ define([
 
     var board = {
         id: 1,
-        name: "Sisters",
+        name: 'Sisters',
         active: 1,
         diffs: []
     };
@@ -60,8 +60,8 @@ define([
         boardStateLastStream.on(function (board) {
             board.diffs.push({
                 id: board.diffs.length + 1,
-                name: "New one 2",
-                description: "Awesome",
+                name: 'New one 2',
+                description: 'Awesome',
                 thumb: {
                     width: null,
                     height: null
@@ -86,11 +86,11 @@ define([
         boardStateLastStream.on(function (board) {
             board.name = name;
             boardStateStream.push(board);
-        })
+        });
     });
 
     var uploadedFilesStream = uploadStream.map(function (e) {
-        return e.target
+        return e.target;
     }).filter(function (el) {
         return el.files.length;
     }).flatMap(function (el) {
@@ -123,7 +123,7 @@ define([
         return {
             width: image.width,
             height: image.height
-        }
+        };
     });
 
     Stream.when([
@@ -132,7 +132,7 @@ define([
     ]).onApply(loadImageIntoCanvas);
 
     // On vent
-    var mapPhantom = onDragMovePhantom(document.getElementById('js-phantom-difference'));
+    //var mapPhantom = onDragMovePhantom(document.getElementById('js-phantom-difference'));
 
     var draggableEndStream = Stream.fromEmitter(documentEmitter, '[draggable="true"]', 'dragend').map(mapDropEventToPosition);
     var draggableDragStream = Stream.fromEmitter(documentEmitter, '[draggable="true"]', 'drag').map(mapDropEventToPosition);
@@ -162,7 +162,7 @@ define([
         thumbCanvas.width = data.width;
         thumbCanvas.height = data.height;
 
-        var thumbContext = thumbCanvas.getContext("2d");
+        var thumbContext = thumbCanvas.getContext('2d');
         thumbContext.putImageData(imageData, 0, 0);
     });
 
@@ -180,7 +180,7 @@ define([
             diff.thumb = {
                 width: thumbCanvas.width,
                 height: thumbCanvas.height
-            }
+            };
         });
     });
 });

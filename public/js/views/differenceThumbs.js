@@ -14,5 +14,5 @@ define(['../dom/el'], function (el) {
                 })
             ]);
         });
-    }
+    };
 });

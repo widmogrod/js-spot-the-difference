@@ -20,25 +20,26 @@ define([
     './utils/loadImageIntoCanvas',
     './views/differenceTails',
     './views/differenceThumbs'
-], function (
-    config,
-    Stream,
-    eventEmitter,
-    mapDropEventToPosition,
-    mapThumbDimensionForCanvas,
-    mapCanvasSelectedPartToImageData,
-    onDragSetTargetPosition,
-    onDragDrawThumb,
-    onDragMovePhantom,
-    loadImageIntoCanvas,
-    differenceTails,
-    differenceThumbs
-) {
+], function (config,
+             Stream,
+             eventEmitter,
+             mapDropEventToPosition,
+             mapThumbDimensionForCanvas,
+             mapCanvasSelectedPartToImageData,
+             onDragSetTargetPosition,
+             onDragDrawThumb,
+             onDragMovePhantom,
+             loadImageIntoCanvas,
+             differenceTails,
+             differenceThumbs) {
     'use strict';
 
-    // Const?
     var documentEmitter = eventEmitter(document);
     var canvasStream = Stream.fromValue(document.getElementById('js-image-main'));
+
+    var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').pluck('target.value').distinct();
+    var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
+    var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
 
     var board = {
         id: 1,
@@ -47,42 +48,44 @@ define([
         diffs: []
     };
 
-    var stateStream = new Stream.Push().distinct();
+    var boardStateStream = new Stream.Push().distinct();
+    var boardStateLastStream = boardStateStream.last().take(1);
 
-    var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').pluck('target.value').distinct();
-    var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
-    var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
+    boardStateStream.log('selectedBoardStateStream');
+    boardStateStream.push(board);
 
     addDiffStream.on(function () {
-        board.diffs.push({
-            id: board.diffs.length + 1,
-            name: "New one 2",
-            description: "Awesome",
-            thumb: {
-                width: null,
-                height: null
-            },
-            percent: {
-                top: 10,
-                left: 10
-            }
+        boardStateLastStream.on(function (board) {
+            board.diffs.push({
+                id: board.diffs.length + 1,
+                name: "New one 2",
+                description: "Awesome",
+                thumb: {
+                    width: null,
+                    height: null
+                },
+                percent: {
+                    top: 10,
+                    left: 10
+                }
+            });
+            boardStateStream.push(board);
         });
-        stateStream.push(board);
     });
 
     // Update DOM
-    stateStream.pluck('name').distinct().toElementProp('#js-name', 'value');
+    boardStateLastStream.pluck('name').distinct().toElementProp('#js-name', 'value');
 
-    var stateDiffsStream =  stateStream.pluck('diffs');
+    var stateDiffsStream = boardStateStream.pluck('diffs');
     stateDiffsStream.map(differenceThumbs).domDiffWith('#js-diffs');
     stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
 
     updateNameStream.on(function (name) {
-        board.name = name;
-        stateStream.push(board);
+        boardStateLastStream.on(function(board) {
+            board.name = name;
+            boardStateStream.push(board);
+        })
     });
-
-    stateStream.push(board);
 
     var uploadedFilesStream = uploadStream.map(function (e) {
         return e.target
@@ -114,7 +117,7 @@ define([
     });
 
     var firstImageStream = imagesStream.take(1);
-    var firstImageDimensionStream = firstImageStream.map(function(image) {
+    var firstImageDimensionStream = firstImageStream.map(function (image) {
         return {
             width: image.width,
             height: image.height
@@ -152,8 +155,8 @@ define([
     Stream.when([
         draggableThumbSizeStream,
         imageDataStream
-    ]).onApply(function(data, imageData){
-        var thumbCanvas = document.querySelector('canvas[data-id="'+ data.id +'"]');
+    ]).onApply(function (data, imageData) {
+        var thumbCanvas = document.querySelector('canvas[data-id="' + data.id + '"]');
         thumbCanvas.width = data.width;
         thumbCanvas.height = data.height;
 
@@ -164,13 +167,13 @@ define([
     Stream.when([
         stateDiffsStream,
         draggableEndStream
-    ]).onApply(function(diffs, e) {
+    ]).onApply(function (diffs, e) {
         var id = parseInt(e.target.element.getAttribute('data-id'));
-        var thumbCanvas = document.querySelector('canvas[data-id="'+ id +'"]');
+        var thumbCanvas = document.querySelector('canvas[data-id="' + id + '"]');
 
-        diffs.filter(function(diff) {
+        diffs.filter(function (diff) {
             return diff.id === id;
-        }).forEach(function(diff) {
+        }).forEach(function (diff) {
             diff.percent = e.percent;
             diff.thumb = {
                 width: thumbCanvas.width,

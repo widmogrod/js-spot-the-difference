@@ -10,25 +10,27 @@ require.config({
 define([
     './config',
     './stream',
-    './dom/el',
     './dom/eventEmitter',
     './utils/mapDropEventToPosition',
     './utils/mapThumbDimensionForCanvas',
     './utils/mapCanvasSelectedPartToImageData',
     './utils/onDragSetTargetPosition',
     './utils/onDragDrawThumb',
-    './utils/onDragMovePhantom'
+    './utils/onDragMovePhantom',
+    './views/differenceTails',
+    './views/differenceThumb'
 ], function (
     config,
     Stream,
-    el,
     eventEmitter,
     mapDropEventToPosition,
     mapThumbDimensionForCanvas,
     mapCanvasSelectedPartToImageData,
     onDragSetTargetPosition,
     onDragDrawThumb,
-    onDragMovePhantom
+    onDragMovePhantom,
+    differenceTails,
+    differenceThumb
 ) {
     'use strict';
 
@@ -84,31 +86,10 @@ define([
 
     // Update DOM
     stateStream.pluck('name').distinct().toElementValue(elBoardName);
-    stateStream.pluck('diffs').map(function (diffs) {
-        return diffs.map(function (diff) {
-            return el('div', {class: 'difference tile'}, [
-                el('canvas', {
-                    class: 'fit',
-                    'data-id': diff.id,
-                    // This is only to patch domDiff updating given properties
-                    // and therefore clearing the canvas
-                    width: diff.thumb.width,
-                    height:diff.thumb.height
-                })
-            ]);
-        });
-    }).domDiffWith(elDiffsContainer);
 
-    stateStream.pluck('diffs').map(function(diffs) {
-        return diffs.map(function (diff) {
-            return el('div', {
-                class: 'difference',
-                draggable: 'true',
-                'data-id': diff.id,
-                style: 'top:'+ diff.percent.top +'%; left:' + diff.percent.left +'%'
-            });
-        });
-    }).domDiffWith(elFirstHalfPreview);
+    var stateDiffsStream =  stateStream.pluck('diffs');
+    stateDiffsStream.map(differenceThumb).domDiffWith(elDiffsContainer);
+    stateDiffsStream.map(differenceTails).domDiffWith(elFirstHalfPreview);
 
     Stream.when([
         updateNameStream,

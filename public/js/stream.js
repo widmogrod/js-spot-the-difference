@@ -25,7 +25,8 @@ define([
     'jef/stream/push-consume',
     './stream/fromElement',
     './stream/fromValue',
-    './stream/domDiffWith'
+    './stream/domDiffWith',
+    './stream/toElementProp'
 ], function(
     Stream,
     map,
@@ -53,7 +54,8 @@ define([
     consume,
     fromElement,
     fromValue,
-    domDiffWith
+    domDiffWith,
+    toElementProp
 ) {
     'use strict';
 
@@ -112,13 +114,11 @@ define([
             fn.apply(thisArg, value);
         });
     };
-    Stream.prototype.toElementValue = function(element) {
-        return this.on(function(value) {
-            element.value = value;
-        });
+    Stream.prototype.toElementProp = function(elementSelector, prop) {
+        return toElementProp(this, elementSelector, prop);
     };
-    Stream.prototype.domDiffWith = function(element) {
-        return domDiffWith(this, element);
+    Stream.prototype.domDiffWith = function(elementSelector) {
+        return domDiffWith(this, elementSelector);
     };
     Stream.prototype.pluck = function(pattern) {
         var path = pattern.split('.'), undefined;
@@ -132,11 +132,6 @@ define([
             }, value);
         });
     };
-    //Stream.prototype.filterUndefined = function(undefined) {
-    //    return this.filter(function(value) {
-    //        return value !== undefined
-    //    })
-    //};
 
     // Factories
     Stream.fromArray = fromArray;

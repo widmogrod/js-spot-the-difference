@@ -1,21 +1,56 @@
-define(function () {
+define(['jef/functional/isArray'], function (isArray) {
     'use strict';
 
-    return function selector(selector, scope) {
-        var element = scope ? scope : document,
-            list = element.querySelectorAll(selector),
-            length = list.length;
+    var _document_ = document;
+
+    function find(selector, scope) {
+        var list, element;
+
+        switch(selector.charAt(0)) {
+            case '#':
+                element = _document_.getElementById(selector.slice(1));
+                list = [element];
+                break;
+
+            case '.':
+                element = _document_.getElementsByClassName(selector.slice(1));
+                list = [element];
+                break;
+
+            default:
+                element = list = scope.querySelectorAll(selector);
+
+        }
 
         return {
-            each: function(fn) {
-                for(var i = 0; i < length; i++) {
-                    fn(this.get(i));
-                }
+            element: element,
+            list: list
+        }
+    }
 
-                return this;
-            },
+    function normalizeSelector(selector) {
+        return isArray(selector)
+            ? selector
+            : selector.replace('  ', ' ').split(' ');
+    }
+
+    return function selector(cssSelector, scope) {
+        var path = normalizeSelector(cssSelector),
+            found = find(path[0], scope ? scope : _document_);
+
+        if (path.length > 1) {
+            return selector(
+                path.slice(1),
+                found.element
+            )
+        }
+
+        return {
+            length: found.list.length,
             get: function(index) {
-                return arguments.length ? list[index] : list;
+                return arguments.length
+                    ? found.list[index]
+                    : found.list;
             }
         }
     }

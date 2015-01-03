@@ -1,10 +1,12 @@
 define([
     '../dom/el',
+    '../dom/selector',
     'jef/functional/isArray',
     'jef/domdiff/diff',
     'jef/domdiff/applyDiff'
 ], function (
     el,
+    selector,
     isArray ,
     domDiff,
     applyDiff
@@ -15,11 +17,19 @@ define([
      * Compute and apply difference between node and streamed value.
      *
      * @param {Stream} stream
-     * @param {Element} element
+     * @param {String} elementSelector
      */
-    return function domDiffWith(stream, element) {
+    return function domDiffWith(stream, elementSelector) {
         return stream.on(function(value) {
+            var found = selector(elementSelector);
+            if (!found.length) {
+                throw new Error(
+                    'domDiffWith: Can\'t match any element ' +
+                    'for given selector: "'+ elementSelector +'"'
+                )
+            }
 
+            var element = found.get(0);
             var clone = element.cloneNode(false);
             var candidate = el(
                 clone,

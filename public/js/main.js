@@ -37,12 +37,7 @@ define([
     'use strict';
 
     // Const?
-    var elBoardName = document.getElementById('js-name');
-    var elDiffsContainer = document.getElementById('js-diffs');
-    var elFirstHalfPreview = document.getElementById('js-first-half-preview');
-    var elSecondHalfPreview = document.getElementById('js-second-half-preview');
     var documentEmitter = eventEmitter(document);
-
     var canvasStream = Stream.fromValue(document.getElementById('js-image-main'));
 
     var board = {
@@ -87,11 +82,11 @@ define([
     });
 
     // Update DOM
-    stateStream.pluck('name').distinct().toElementValue(elBoardName);
+    stateStream.pluck('name').distinct().toElementProp('#js-name', 'value');
 
     var stateDiffsStream =  stateStream.pluck('diffs');
-    stateDiffsStream.map(differenceThumb).domDiffWith(elDiffsContainer);
-    stateDiffsStream.map(differenceTails).domDiffWith(elFirstHalfPreview);
+    stateDiffsStream.map(differenceThumb).domDiffWith('#js-diffs');
+    stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
 
     Stream.when([
         updateNameStream,
@@ -111,6 +106,7 @@ define([
     }).filter(function (file) {
         return config.acceptedTypes[file.type];
     });
+
     var imagesStream = uploadedFilesStream.flatMap(function (file) {
         var reader = new FileReader();
         var stream = Stream.fromElement(reader);

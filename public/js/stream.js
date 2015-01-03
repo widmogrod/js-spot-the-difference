@@ -24,6 +24,7 @@ define([
     'jef/stream/push-stream',
     'jef/stream/push-consume',
     './stream/fromElement',
+    './stream/fromValue',
     './stream/domDiffWith'
 ], function(
     Stream,
@@ -51,6 +52,7 @@ define([
     PushStream,
     consume,
     fromElement,
+    fromValue,
     domDiffWith
 ) {
     'use strict';
@@ -142,6 +144,7 @@ define([
     Stream.fromCallback = fromCallback;
     Stream.fromPromise = fromPromise;
     Stream.fromElement = fromElement;
+    Stream.fromValue = fromValue;
     Stream.both = both;
     Stream.when = when;
     //Stream.noop = noop;

@@ -14,7 +14,7 @@ define([
     './dom/eventEmitter',
     './utils/mapDropEventToPosition',
     './utils/mapThumbDimensionForCanvas',
-    './utils/mapThumbToImageData',
+    './utils/mapCanvasSelectedPartToImageData',
     './utils/onDragSetTargetPosition',
     './utils/onDragDrawThumb',
     './utils/onDragMovePhantom'
@@ -25,7 +25,7 @@ define([
     eventEmitter,
     mapDropEventToPosition,
     mapThumbDimensionForCanvas,
-    mapThumbToImageData,
+    mapCanvasSelectedPartToImageData,
     onDragSetTargetPosition,
     onDragDrawThumb,
     onDragMovePhantom
@@ -33,12 +33,13 @@ define([
     'use strict';
 
     // Const?
-    var elCanvas = document.getElementById('js-image-main');
     var elBoardName = document.getElementById('js-name');
     var elDiffsContainer = document.getElementById('js-diffs');
     var elFirstHalfPreview = document.getElementById('js-first-half-preview');
     var elSecondHalfPreview = document.getElementById('js-second-half-preview');
     var documentEmitter = eventEmitter(document);
+
+    var canvasStream = Stream.fromValue(document.getElementById('js-image-main'));
 
     var board = {
         id: 1,
@@ -127,7 +128,7 @@ define([
     }).filter(function (file) {
         return config.acceptedTypes[file.type];
     });
-    var thumbsStream = uploadedFilesStream.flatMap(function (file) {
+    var imagesStream = uploadedFilesStream.flatMap(function (file) {
         var reader = new FileReader();
         var stream = Stream.fromElement(reader);
 
@@ -146,24 +147,27 @@ define([
         return event.path[0];
     });
 
-    var firstThumbStream = thumbsStream.take(1);
-    var firstThumbDimensionStream = firstThumbStream.map(function(elCanvas) {
+    var firstImageStream = imagesStream.take(1);
+    var firstImageDimensionStream = firstImageStream.map(function(image) {
         return {
-            width: elCanvas.width,
-            height: elCanvas.height
+            width: image.width,
+            height: image.height
         }
     });
-    firstThumbStream.on(function (image) {
-        elCanvas.width = image.width;
-        elCanvas.height = image.height;
-        var context = elCanvas.getContext("2d");
+
+    Stream.when([
+        canvasStream,
+        firstImageStream
+    ]).onApply(function(canvas, image) {
+        canvas.width = image.width;
+        canvas.height = image.height;
+        var context = canvas.getContext("2d");
         context.drawImage(image, 0, 0);
-        elCanvas.style.width = '100%';
-        elCanvas.style.height = 'auto';
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
     });
 
     // On vent
-    //var drawThumb = onDragDrawThumb(elCanvas, document.getElementById('js-diff-1'));
     var mapPhantom = onDragMovePhantom(document.getElementById('js-phantom-difference'));
 
     var draggableEndStream = Stream.fromEmitter(documentEmitter, '[draggable="true"]', 'dragend').map(mapDropEventToPosition);
@@ -177,13 +181,18 @@ define([
     //var draggableThumbSizeStream = draggableAllStream.map();
 
     var draggableThumbSizeStream = Stream.when([
-        firstThumbDimensionStream,
+        firstImageDimensionStream,
         draggableAllStream
     ]).apply(mapThumbDimensionForCanvas);
 
+    var imageDataStream = Stream.when([
+        canvasStream,
+        draggableThumbSizeStream
+    ]).apply(mapCanvasSelectedPartToImageData);
+
     Stream.when([
         draggableThumbSizeStream,
-        draggableThumbSizeStream.map(mapThumbToImageData(elCanvas))
+        imageDataStream
     ]).onApply(function(data, imageData){
         var thumbCanvas = document.querySelector('canvas[data-id="'+ data.id +'"]');
         thumbCanvas.width = data.width;

@@ -143,8 +143,7 @@ define([
         return event.path[0];
     });
 
-    var firstImageStream = imagesStream.take(1);
-    var firstImageDimensionStream = firstImageStream.map(function (image) {
+    var imageDimensionStream = imagesStream.map(function (image) {
         return {
             width: image.width,
             height: image.height
@@ -152,7 +151,7 @@ define([
     });
 
     Stream.when([
-        firstImageStream,
+        imagesStream,
         canvasStream
     ]).onApply(loadImageIntoCanvas);
 
@@ -170,7 +169,7 @@ define([
     //var draggableThumbSizeStream = draggableAllStream.map();
 
     var draggableThumbSizeStream = Stream.when([
-        firstImageDimensionStream,
+        imageDimensionStream,
         draggableAllStream
     ]).mapApply(mapThumbDimensionForCanvas);
 

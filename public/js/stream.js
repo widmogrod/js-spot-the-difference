@@ -114,6 +114,17 @@ define([
             fn.apply(thisArg, value);
         });
     };
+    Stream.prototype.onWith = function(stream, fn, thisArg) {
+        return this.on(function(valueA) {
+            stream.on(function(valueB) {
+                fn.call(thisArg, valueA, valueB);
+                return Stream.stop;
+            });
+        });
+    };
+    Stream.prototype.onWithLast = function(stream, fn, thisArg) {
+        return this.onWith(stream.last(), fn, thisArg);
+    };
     Stream.prototype.toElementProp = function(elementSelector, prop) {
         return toElementProp(this, elementSelector, prop);
     };

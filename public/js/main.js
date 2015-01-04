@@ -19,7 +19,8 @@ define([
     './utils/onDragMovePhantom',
     './utils/loadImageIntoCanvas',
     './views/differenceTails',
-    './views/differenceThumbs'
+    './views/differenceThumbs',
+    './functional/findIndex'
 ], function (
     config,
     Stream,
@@ -32,7 +33,8 @@ define([
     onDragMovePhantom,
     loadImageIntoCanvas,
     differenceTails,
-    differenceThumbs
+    differenceThumbs,
+    findIndex
 ) {
     'use strict';
 
@@ -43,50 +45,73 @@ define([
     var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
     var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
 
-    var board = {
-        id: 1,
-        name: 'Sisters',
-        active: 1,
-        diffs: []
+    var state = {
+        selectedBoard: 1,
+        boards: [
+            {
+                id: 1,
+                name: 'Sisters',
+                active: 1,
+                diffs: []
+            }
+        ]
     };
 
-    var boardStateStream = new Stream.Push().distinct();
-    var boardStateLastStream = boardStateStream.last().take(1);
-
-    boardStateStream.log('selectedBoardStateStream');
-    boardStateStream.push(board);
-
-    addDiffStream.on(function () {
-        boardStateLastStream.on(function (board) {
-            board.diffs.push({
-                id: board.diffs.length + 1,
-                name: 'New one 2',
-                description: 'Awesome',
-                thumb: {
-                    width: null,
-                    height: null
-                },
-                percent: {
-                    top: 10,
-                    left: 10
-                }
-            });
-            boardStateStream.push(board);
+    var stateStream = new Stream.Push();
+    var boardStateStream = stateStream.flatMap(function(state) {
+        return Stream.fromArray(state.boards).filter(function(board) {
+            return board.id === state.selectedBoard;
         });
     });
 
+    var boardUpdateStream = new Stream.Push();
+    boardUpdateStream.onWithLast(stateStream, function(board, state) {
+        var index = findIndex(state.boards,  function(board) {
+            return board.id === state.selectedBoard;
+        });
+
+        state.boards[index] = board;
+        stateStream.push(state);
+    });
+
+    setTimeout(function() {
+        stateStream.push(state);
+    }, 10);
+
+
+    stateStream.log('stateStream');
+    boardStateStream.log('boardStateStream');
+    boardUpdateStream.log('boardUpdateStream');
+    addDiffStream.log('addDiffStream');
+
+    addDiffStream.onWithLast(boardStateStream, function (e, board) {
+        board.diffs.push({
+            id: board.diffs.length + 1,
+            name: 'New one 2',
+            description: 'Awesome',
+            thumb: {
+                width: null,
+                height: null
+            },
+            percent: {
+                top: 10,
+                left: 10
+            }
+        });
+
+        boardUpdateStream.push(board);
+    });
+
     // Update DOM
-    boardStateLastStream.pluck('name').distinct().toElementProp('#js-name', 'value');
+    boardStateStream.pluck('name').distinct().toElementProp('#js-name', 'value');
 
     var stateDiffsStream = boardStateStream.pluck('diffs');
     stateDiffsStream.map(differenceThumbs).domDiffWith('#js-diffs');
     stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
 
-    updateNameStream.on(function (name) {
-        boardStateLastStream.on(function (board) {
-            board.name = name;
-            boardStateStream.push(board);
-        });
+    updateNameStream.onWithLast(boardStateStream, function (name, board) {
+        board.name = name;
+        boardUpdateStream.push(board);
     });
 
     var uploadedFilesStream = uploadStream.map(function (e) {

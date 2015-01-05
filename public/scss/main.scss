@@ -2,6 +2,8 @@ $line-height: 24px;
 $font-size: 16px;
 $font-style: "Helvetica Neue Light", "HelveticaNeue-Light", "Helvetica Neue", Calibri, Helvetica, Arial;
 
+$action-delete-background-color: rgba(255, 0, 0, 0.3);
+
 $border-radius: 7px;
 
 $thumb-width: 70px;
@@ -32,6 +34,28 @@ $difference-background-color: #4593e3;
 $difference-box-shadow-color: #326aa3;
 $difference-button-background-color: #3a7bbe;
 $difference-button-color: #fff;
+
+@mixin thumbFont() {
+    line-height: $thumb-height;
+    font-size: $thumb-height/2;
+}
+
+@mixin overlay() {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+}
+
+@mixin hideText() {
+    overflow: hidden;
+    text-indent: -999em;
+}
+
+@mixin showText() {
+    text-indent: 0;
+}
 
 /* Mobile first queries */
 * {
@@ -65,6 +89,7 @@ h1 {
     font-size: 42px;
     line-height: 52px;
 }
+
 h2 {
     font-size: 32px;
     line-height: 42px;
@@ -91,7 +116,6 @@ h1, h2, p, span, div {
         }
     }
 }
-
 
 .btn,
 .text {
@@ -255,7 +279,7 @@ a.btn {
 .canvas {
     position: absolute;
     top: 0;
-    left:0;
+    left: 0;
     right: 0;
     bottom: 0;
     z-index: 2;
@@ -268,12 +292,28 @@ a.btn {
 }
 
 .tile {
+    position: relative;
     width: $thumb-width;
     height: $thumb-height;
+
     &.btn {
-        line-height: $thumb-height;
-        font-size: $thumb-height/2;
+        @include thumbFont();
         padding: 0;
+    }
+}
+
+.action {
+    cursor: pointer;
+    &.overlay {
+        @include overlay();
+        @include thumbFont();
+        @include hideText();
+
+        &:hover {
+            @include showText();
+            background-color: $action-delete-background-color;
+            text-align: center;
+        }
     }
 }
 
@@ -309,16 +349,21 @@ a.btn {
 }
 
 /* Larger than mobile */
-@media (min-width: 400px) {}
+@media (min-width: 400px) {
+}
 
 /* Larger than phablet */
-@media (min-width: 550px) {}
+@media (min-width: 550px) {
+}
 
 /* Larger than tablet */
-@media (min-width: 750px) {}
+@media (min-width: 750px) {
+}
 
 /* Larger than desktop */
-@media (min-width: 1000px) {}
+@media (min-width: 1000px) {
+}
 
 /* Larger than Desktop HD */
-@media (min-width: 1200px) {}
+@media (min-width: 1200px) {
+}

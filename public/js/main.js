@@ -124,7 +124,7 @@ define([
         return config.acceptedTypes[file.type];
     });
 
-    var imagesStream = uploadedFilesStream.flatMap(function (file) {
+    var uploadedImagesStream = uploadedFilesStream.flatMap(function (file) {
         var reader = new FileReader();
         var stream = Stream.fromElement(reader);
 
@@ -134,13 +134,25 @@ define([
     }).flatMap(function (event) {
         var image = new Image();
         var stream = Stream.fromElement(image);
-
         image.src = event.target.result;
-        image.style.width = '100%';
 
         return stream;
     }).map(function (event) {
         return event.path[0];
+    });
+
+    uploadedImagesStream.onWithLast(boardStateStream, function (image, board) {
+        board.imageData = image.src;
+        boardUpdateStream.push(board);
+    });
+
+    var imagesStream = boardStateStream.filter(function(board){
+        return !!board.imageData;
+    }).map(function(board) {
+        var image = new Image();
+        image.src = board.imageData;
+        image.style.width = '100%';
+        return image;
     });
 
     var imageDimensionStream = imagesStream.map(function (image) {

@@ -43,6 +43,7 @@ define([
 
     var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').pluck('target.value').distinct();
     var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
+    var removeDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="remove-diff"]', 'click');
     var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
 
     var state = {
@@ -52,6 +53,7 @@ define([
                 id: 1,
                 name: 'Sisters',
                 active: 1,
+                diffsLastIndex: 0,
                 diffs: []
             }
         ]
@@ -79,14 +81,15 @@ define([
     }, 10);
 
 
-    stateStream.log('stateStream');
-    boardStateStream.log('boardStateStream');
-    boardUpdateStream.log('boardUpdateStream');
-    addDiffStream.log('addDiffStream');
+    //stateStream.log('stateStream');
+    //boardStateStream.log('boardStateStream');
+    //boardUpdateStream.log('boardUpdateStream');
+    //addDiffStream.log('addDiffStream');
+    //removeDiffStream.log('removeDiffStream');
 
     addDiffStream.onWithLast(boardStateStream, function (e, board) {
         board.diffs.push({
-            id: board.diffs.length + 1,
+            id: ++board.diffsLastIndex,
             name: 'New one 2',
             description: 'Awesome',
             thumb: {
@@ -99,6 +102,16 @@ define([
             }
         });
 
+        boardUpdateStream.push(board);
+    });
+
+    removeDiffStream.onWithLast(boardStateStream, function(e, board) {
+        var id = parseInt(e.target.getAttribute('data-id'));
+        var index = findIndex(board.diffs,  function(diff) {
+            return diff.id === id;
+        });
+
+        board.diffs.splice(index, 1);
         boardUpdateStream.push(board);
     });
 

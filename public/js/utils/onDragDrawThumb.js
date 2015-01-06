@@ -20,8 +20,8 @@ define(function () {
             thumbCanvas.height = height;
             thumbCanvas.style.width = '100%';
 
-            var thumbContext = thumbCanvas.getContext("2d");
+            var thumbContext = thumbCanvas.getContext('2d');
             thumbContext.putImageData(imageData, 0, 0);
-        }
-    }
+        };
+    };
 });

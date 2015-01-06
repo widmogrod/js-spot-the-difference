@@ -15,6 +15,15 @@
             <span>Puzzle game written in JavaScript using streams.</span>
         </h1>
     </div>
+    <div class="component board">
+        <button data-action="add-board" class="btn tile">+</button>
+        <div id="js-boards">
+            <span class="board tile">
+                <canvas class="fit" data-id="1"></canvas>
+                <h3 class="name">Sisters</h3>
+            </span>
+        </div>
+    </div>
     <div class="component admin">
         <input type="file" data-action="upload"/>
         <input type="text" name="name" data-action="update-name" class="text" id="js-name"/>
@@ -32,12 +41,6 @@
         </div>
         <canvas id="js-image-main"></canvas>
     </div>
-    <!--<div class="component navigation">-->
-        <!--<span class="differences">-->
-            <!--<span class="found">0</span>-->
-            <!--<span class="total">10</span>-->
-        <!--</span>-->
-    <!--</div>-->
     <div class="component differences">
         <button data-action="add-diff" class="btn tile">+</button>
         <div id="js-diffs"></div>

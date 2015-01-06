@@ -10,10 +10,10 @@ $thumb-width: 70px;
 $thumb-height: 70px;
 $thumb-border-size: 3px;
 
-$navigation-background-color: #c4c5c2;
-$navigation-box-shadow-color: #9e9d9b;
-$navigation-button-background-color: #a8a6aa;
-$navigation-button-color: #fff;
+$board-background-color: #c4c5c2;
+$board-box-shadow-color: #9e9d9b;
+$board-button-background-color: #a8a6aa;
+$board-button-color: #fff;
 
 $admin-background-color: #2ac56c;
 $admin-box-shadow-color: #119e4d;
@@ -186,17 +186,17 @@ a.btn {
             }
         }
     }
-    &.navigation {
-        background-color: $navigation-background-color;
+    &.board {
+        background-color: $board-background-color;
         .btn,
         .text {
-            box-shadow: 0 5px $navigation-box-shadow-color;
+            box-shadow: 0 5px $board-box-shadow-color;
         }
 
         .btn {
-            background: $navigation-button-background-color;
+            background: $board-button-background-color;
             &:hover {
-                box-shadow: 0 3px $navigation-box-shadow-color;
+                box-shadow: 0 3px $board-box-shadow-color;
             }
             &:active {
                 box-shadow: none;
@@ -322,11 +322,35 @@ a.btn {
 }
 
 .component {
+    &.board {
+        overflow: hidden;
+
+        .btn,
+        .board {
+            float: left;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+
+        .board {
+            border: 3px solid #fff;
+            border-radius: $border-radius;
+            box-shadow: 0 5px $board-box-shadow-color;
+        }
+
+        .tile {
+            width: 150px;
+            height: 150px;
+        }
+    }
+}
+
+.component {
     &.differences {
         overflow: hidden;
 
-        .difference,
-        .btn {
+        .btn,
+        .difference {
             float: left;
             margin-right: 10px;
             margin-bottom: 10px;
@@ -336,14 +360,14 @@ a.btn {
             border: 3px solid #fff;
             border-radius: $border-radius;
             box-shadow: 0 5px $difference-box-shadow-color;
-            .thumb {
-                &.empty {
-                    font-size: 40px;
-                    line-height: 70px;
-                    text-align: center;
-                    font-weight: bold;
-                }
-            }
+            //            .thumb {
+            //                &.empty {
+            //                    font-size: 40px;
+            //                    line-height: 70px;
+            //                    text-align: center;
+            //                    font-weight: bold;
+            //                }
+            //            }
         }
     }
 }

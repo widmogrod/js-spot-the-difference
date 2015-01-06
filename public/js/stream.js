@@ -111,7 +111,7 @@ define([
     };
     Stream.prototype.onApply = function(fn, thisArg) {
         return this.on(function(value) {
-            fn.apply(thisArg, value);
+            return fn.apply(thisArg, value);
         });
     };
     Stream.prototype.onWith = function(stream, fn, thisArg) {

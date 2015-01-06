@@ -18,6 +18,7 @@ define([
     './utils/onDragDrawThumb',
     './utils/onDragMovePhantom',
     './utils/loadImageIntoCanvas',
+    './views/boardThumbs',
     './views/differenceTails',
     './views/differenceThumbs',
     './functional/findIndex'
@@ -32,6 +33,7 @@ define([
     onDragDrawThumb,
     onDragMovePhantom,
     loadImageIntoCanvas,
+    boardThumbs,
     differenceTails,
     differenceThumbs,
     findIndex
@@ -42,51 +44,70 @@ define([
     var canvasStream = Stream.fromValue(document.getElementById('js-image-main'));
 
     var updateNameStream = Stream.fromEmitter(documentEmitter, '[data-action="update-name"]', 'keyup').pluck('target.value').distinct();
+    var addBoardStream = Stream.fromEmitter(documentEmitter, '[data-action="add-board"]', 'click');
+    var editBoardStream = Stream.fromEmitter(documentEmitter, '[data-action="edit-board"]', 'click');
     var addDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="add-diff"]', 'click');
     var removeDiffStream = Stream.fromEmitter(documentEmitter, '[data-action="remove-diff"]', 'click');
     var uploadStream = Stream.fromEmitter(documentEmitter, '[data-action="upload"]', 'change');
 
     var state = {
-        selectedBoard: 1,
-        boards: [
-            {
-                id: 1,
-                name: 'Sisters',
-                active: 1,
-                diffsLastIndex: 0,
-                diffs: []
-            }
-        ]
+        selectedBoard: 0,
+        boardLastIndex: 0,
+        boards: []
     };
 
-    var stateStream = new Stream.Push();
-    var boardStateStream = stateStream.flatMap(function(state) {
-        return Stream.fromArray(state.boards).filter(function(board) {
+    var gameStateStream = new Stream.Push();
+    var boardStateStream = gameStateStream.map(function(state) {
+        var index = findIndex(state.boards, function(board) {
             return board.id === state.selectedBoard;
         });
+
+        return state.boards[index];
+    }).filter(function(board) {
+        return !!board;
     });
 
     var boardUpdateStream = new Stream.Push();
-    boardUpdateStream.onWithLast(stateStream, function(board, state) {
-        var index = findIndex(state.boards,  function(board) {
-            return board.id === state.selectedBoard;
+    boardUpdateStream.onWithLast(gameStateStream, function(board, state) {
+        var index = findIndex(state.boards, function(value) {
+            return value.id === board.id;
         });
 
         state.boards[index] = board;
-        stateStream.push(state);
+        gameStateStream.push(state);
     });
 
     setTimeout(function() {
-        stateStream.push(state);
+        gameStateStream.push(state);
     }, 10);
 
+    gameStateStream.log('gameStateStream');
+    boardStateStream.log('boardStateStream');
+    //gameStateLastStream.log('gameStateLastStream');
+    boardUpdateStream.log('boardUpdateStream');
+    addDiffStream.log('addDiffStream');
+    addBoardStream.log('addBoardStream');
+    editBoardStream.log('editBoardStream');
+    removeDiffStream.log('removeDiffStream');
 
-    //stateStream.log('stateStream');
-    //boardStateStream.log('boardStateStream');
-    //boardUpdateStream.log('boardUpdateStream');
-    //addDiffStream.log('addDiffStream');
-    //removeDiffStream.log('removeDiffStream');
-
+    editBoardStream.onWithLast(gameStateStream, function(e, state) {
+        var id = parseInt(e.target.getAttribute('data-id'));
+        state.selectedBoard = id;
+        gameStateStream.push(state);
+    });
+    addBoardStream.onWithLast(gameStateStream, function(e, state) {
+        state.boards.push({
+            id: ++state.boardLastIndex,
+            name: 'Sisters',
+            diffsLastIndex: 0,
+            diffs: []
+        });
+        gameStateStream.push(state);
+    });
+    updateNameStream.onWithLast(boardStateStream, function (name, board) {
+        board.name = name;
+        boardUpdateStream.push(board);
+    });
     addDiffStream.onWithLast(boardStateStream, function (e, board) {
         board.diffs.push({
             id: ++board.diffsLastIndex,
@@ -104,7 +125,6 @@ define([
 
         boardUpdateStream.push(board);
     });
-
     removeDiffStream.onWithLast(boardStateStream, function(e, board) {
         var id = parseInt(e.target.getAttribute('data-id'));
         var index = findIndex(board.diffs,  function(diff) {
@@ -116,16 +136,12 @@ define([
     });
 
     // Update DOM
+    gameStateStream.pluck('boards').map(boardThumbs).domDiffWith('#js-boards');
     boardStateStream.pluck('name').distinct().toElementProp('#js-name', 'value');
 
     var stateDiffsStream = boardStateStream.pluck('diffs');
     stateDiffsStream.map(differenceThumbs).domDiffWith('#js-diffs');
     stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
-
-    updateNameStream.onWithLast(boardStateStream, function (name, board) {
-        board.name = name;
-        boardUpdateStream.push(board);
-    });
 
     var uploadedFilesStream = uploadStream.map(function (e) {
         return e.target;

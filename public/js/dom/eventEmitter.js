@@ -1,7 +1,7 @@
 /*Global:Element*/
-define(function () {
+define(function() {
     'use strict';
-    
+
     var elementProto = Element.prototype;
     var matchesSelector = elementProto.mozMatchesSelector
         || elementProto.webkitMatchesSelector
@@ -17,6 +17,6 @@ define(function () {
                     }
                 }, false);
             }
-        }
-    }
+        };
+    };
 });

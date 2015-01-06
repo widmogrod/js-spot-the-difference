@@ -16,10 +16,11 @@ define([
                 throw new Error(
                     'toElementProp: Can\'t match any element ' +
                     'for given selector: "'+ elementSelector +'"'
-                )
+                );
             }
 
             found.get(0)[prop] = value;
+            found = null;
         });
-    }
+    };
 });

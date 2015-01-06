@@ -26,7 +26,7 @@ define([
                 throw new Error(
                     'domDiffWith: Can\'t match any element ' +
                     'for given selector: "'+ elementSelector +'"'
-                )
+                );
             }
 
             var element = found.get(0);
@@ -43,7 +43,12 @@ define([
                     element,
                     candidate
                 )
-            )
+            );
+
+            clone = null;
+            found = null;
+            element = null;
+            candidate = null;
         });
-    }
+    };
 });

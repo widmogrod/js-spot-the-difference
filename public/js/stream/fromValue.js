@@ -10,5 +10,5 @@ define(['jef/stream/stream'], function (Stream) {
             sinkValue(value);
             sinkComplete();
         });
-    }
+    };
 });

@@ -16,5 +16,5 @@ define(['jef/stream/stream'], function (Stream) {
                 sinkError(error);
             };
         });
-    }
+    };
 });

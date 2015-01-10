@@ -81,18 +81,8 @@ define([
         gameStateStream.push(state);
     }, 10);
 
-    gameStateStream.log('gameStateStream');
-    boardStateStream.log('boardStateStream');
-    //gameStateLastStream.log('gameStateLastStream');
-    boardUpdateStream.log('boardUpdateStream');
-    addDiffStream.log('addDiffStream');
-    addBoardStream.log('addBoardStream');
-    editBoardStream.log('editBoardStream');
-    removeDiffStream.log('removeDiffStream');
-
     editBoardStream.onWithLast(gameStateStream, function(e, state) {
-        var id = parseInt(e.target.getAttribute('data-id'));
-        state.selectedBoard = id;
+        state.selectedBoard = parseInt(e.target.getAttribute('data-id'));
         gameStateStream.push(state);
     });
     addBoardStream.onWithLast(gameStateStream, function(e, state) {
@@ -175,12 +165,13 @@ define([
         boardUpdateStream.push(board);
     });
 
-    var imagesStream = boardStateStream.filter(function(board){
-        return !!board.imageData;
-    }).map(function(board) {
+    var imagesStream = boardStateStream.map(function(board) {
         var image = new Image();
+        if (board.imageData) {
+
         image.src = board.imageData;
         image.style.width = '100%';
+        }
         return image;
     });
 

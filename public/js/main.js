@@ -168,9 +168,8 @@ define([
     var imagesStream = boardStateStream.map(function(board) {
         var image = new Image();
         if (board.imageData) {
-
-        image.src = board.imageData;
-        image.style.width = '100%';
+            image.src = board.imageData;
+            image.style.width = '100%';
         }
         return image;
     });

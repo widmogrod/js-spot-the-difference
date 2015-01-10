@@ -6,6 +6,7 @@ define(['../dom/el'], function (el) {
             return el('div', {class: 'board tile'}, [
                 el('canvas', {
                     'class': 'fit',
+                    'data-context': 'board',
                     'data-id': board.id
                     // This is only to patch domDiff updating given properties
                     // and therefore clearing the canvas

@@ -1,18 +1,18 @@
-define(['../dom/position', '../utils/between'], function (position, between) {
+define(['../dom/position', '../utils/between'], function(position, between) {
     'use strict';
 
     return function mapDropEventToPosition(e) {
         var elTarget = e.target,
             target = {
                 element: elTarget,
-                width: elTarget.offsetWidth >> 0,
-                height: elTarget.offsetHeight >> 0,
+                width: elTarget.offsetWidth |0,
+                height: elTarget.offsetHeight |0,
                 position: position(elTarget)
             },
             elParent = elTarget.parentNode,
             parent = {
-                width: elParent.offsetWidth >> 0,
-                height: elParent.offsetHeight >> 0,
+                width: elParent.offsetWidth |0,
+                height: elParent.offsetHeight |0,
                 position: position(elParent)
             },
             x = between(

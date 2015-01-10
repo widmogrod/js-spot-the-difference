@@ -213,7 +213,7 @@ define([
         draggableThumbSizeStream,
         imageDataStream
     ]).onApply(function (data, imageData) {
-        var thumbCanvas = document.querySelector('canvas[data-id="' + data.id + '"]');
+        var thumbCanvas = document.querySelector('canvas[data-context="diff"][data-id="' + data.id + '"]');
         thumbCanvas.width = data.width;
         thumbCanvas.height = data.height;
 
@@ -226,7 +226,7 @@ define([
         draggableEndStream
     ]).onApply(function (diffs, e) {
         var id = parseInt(e.target.element.getAttribute('data-id'));
-        var thumbCanvas = document.querySelector('canvas[data-id="' + id + '"]');
+        var thumbCanvas = document.querySelector('canvas[data-context="diff"][data-id="' + id + '"]');
 
         diffs.filter(function (diff) {
             return diff.id === id;

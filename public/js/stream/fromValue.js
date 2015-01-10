@@ -1,4 +1,8 @@
-define(['jef/stream/stream'], function (Stream) {
+define([
+    'jef/stream/stream',
+    'jef/stream/decorator/on-attach-decorator',
+    'jef/functional/noop'
+], function (Stream, StreamOnAttachDecorator, noop) {
     'use strict';
 
     /**
@@ -6,9 +10,10 @@ define(['jef/stream/stream'], function (Stream) {
      * @return {Stream}
      */
     return function fromValue(value) {
-        return new Stream(function (sinkValue, sinkError, sinkComplete) {
-            sinkValue(value);
-            sinkComplete();
+        return new StreamOnAttachDecorator(noop, function(onValue, onError, onComplete) {
+            onValue(value);
+            onComplete();
+            return Stream.stop;
         });
     };
 });

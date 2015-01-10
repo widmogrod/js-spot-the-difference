@@ -336,11 +336,22 @@ a.btn {
             border: 3px solid #fff;
             border-radius: $border-radius;
             box-shadow: 0 5px $board-box-shadow-color;
+            .name {
+                position: absolute;
+                cursor: pointer;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                padding: 10px;
+                text-align: center;
+                background-color: rgba(0, 0, 0, 0.4);
+            }
         }
 
         .tile {
             width: 150px;
             height: 150px;
+            overflow: hidden;
         }
     }
 }
@@ -360,14 +371,6 @@ a.btn {
             border: 3px solid #fff;
             border-radius: $border-radius;
             box-shadow: 0 5px $difference-box-shadow-color;
-            //            .thumb {
-            //                &.empty {
-            //                    font-size: 40px;
-            //                    line-height: 70px;
-            //                    text-align: center;
-            //                    font-weight: bold;
-            //                }
-            //            }
         }
     }
 }

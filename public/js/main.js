@@ -88,7 +88,7 @@ define([
     addBoardStream.onWithLast(gameStateStream, function(e, state) {
         state.boards.push({
             id: ++state.boardLastIndex,
-            name: 'Sisters',
+            name: 'New board',
             diffsLastIndex: 0,
             diffs: []
         });
@@ -237,5 +237,24 @@ define([
                 height: thumbCanvas.height
             };
         });
+    });
+
+
+    // Update board thumbnails
+    gameStateStream.filter(function(state) {
+        return state && state.boards && state.boards.length;
+    }).flatMap(function(state) {
+        return Stream.fromArray(state.boards);
+    }).on(function(board) {
+        if (board.imageData) {
+            var image = new Image();
+            image.src = board.imageData;
+
+            var thumbCanvas = document.querySelector('canvas[data-context="board"][data-id="' + board.id + '"]');
+            thumbCanvas.width = image.width / 2;
+            thumbCanvas.height = image.height;
+            var thumbContext = thumbCanvas.getContext('2d');
+            thumbContext.drawImage(image, 0, 0);
+        }
     });
 });

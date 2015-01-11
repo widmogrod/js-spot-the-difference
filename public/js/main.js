@@ -129,9 +129,9 @@ define([
     gameStateStream.pluck('boards').map(boardThumbs).domDiffWith('#js-boards');
     boardStateStream.pluck('name').distinct().toElementProp('#js-name', 'value');
 
-    var stateDiffsStream = boardStateStream.pluck('diffs');
-    stateDiffsStream.map(differenceThumbs).domDiffWith('#js-diffs');
-    stateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
+    var boardStateDiffsStream = boardStateStream.pluck('diffs');
+    boardStateDiffsStream.map(differenceThumbs).domDiffWith('#js-diffs');
+    boardStateDiffsStream.map(differenceTails).domDiffWith('#js-first-half-preview');
 
     var uploadedFilesStream = uploadStream.map(function (e) {
         return e.target;
@@ -222,7 +222,7 @@ define([
     });
 
     Stream.when([
-        stateDiffsStream,
+        boardStateDiffsStream,
         draggableEndStream
     ]).onApply(function (diffs, e) {
         var id = parseInt(e.target.element.getAttribute('data-id'));

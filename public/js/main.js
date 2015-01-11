@@ -57,6 +57,7 @@ define([
     };
 
     var gameStateStream = new Stream.Push();
+    var gameStateLastStream = gameStateStream.last();
     var boardStateStream = gameStateStream.map(function(state) {
         var index = findIndex(state.boards, function(board) {
             return board.id === state.selectedBoard;
@@ -66,9 +67,10 @@ define([
     }).filter(function(board) {
         return !!board;
     });
+    var boardStateLastStream = boardStateStream.last();
 
     var boardUpdateStream = new Stream.Push();
-    boardUpdateStream.onWithLast(gameStateStream, function(board, state) {
+    boardUpdateStream.onWith(gameStateLastStream, function(board, state) {
         var index = findIndex(state.boards, function(value) {
             return value.id === board.id;
         });
@@ -81,11 +83,11 @@ define([
         gameStateStream.push(state);
     }, 10);
 
-    editBoardStream.onWithLast(gameStateStream, function(e, state) {
+    editBoardStream.onWith(gameStateLastStream, function(e, state) {
         state.selectedBoard = parseInt(e.target.getAttribute('data-id'));
         gameStateStream.push(state);
     });
-    addBoardStream.onWithLast(gameStateStream, function(e, state) {
+    addBoardStream.onWith(gameStateLastStream, function(e, state) {
         state.boards.push({
             id: ++state.boardLastIndex,
             name: 'New board',
@@ -94,11 +96,11 @@ define([
         });
         gameStateStream.push(state);
     });
-    updateNameStream.onWithLast(boardStateStream, function (name, board) {
+    updateNameStream.onWith(boardStateLastStream, function (name, board) {
         board.name = name;
         boardUpdateStream.push(board);
     });
-    addDiffStream.onWithLast(boardStateStream, function (e, board) {
+    addDiffStream.onWith(boardStateLastStream, function (e, board) {
         board.diffs.push({
             id: ++board.diffsLastIndex,
             name: 'New one 2',
@@ -115,7 +117,7 @@ define([
 
         boardUpdateStream.push(board);
     });
-    removeDiffStream.onWithLast(boardStateStream, function(e, board) {
+    removeDiffStream.onWith(boardStateLastStream, function(e, board) {
         var id = parseInt(e.target.getAttribute('data-id'));
         var index = findIndex(board.diffs,  function(diff) {
             return diff.id === id;
@@ -160,7 +162,7 @@ define([
         return event.path[0];
     });
 
-    uploadedImagesStream.onWithLast(boardStateStream, function (image, board) {
+    uploadedImagesStream.onWith(boardStateLastStream, function (image, board) {
         board.imageData = image.src;
         boardUpdateStream.push(board);
     });

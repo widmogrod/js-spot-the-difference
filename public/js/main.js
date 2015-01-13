@@ -69,6 +69,7 @@ define([
     });
     var boardStateLastStream = boardStateStream.last();
 
+
     var boardUpdateStream = new Stream.Push();
     boardUpdateStream.onWith(gameStateLastStream, function(board, state) {
         var index = findIndex(state.boards, function(value) {
@@ -78,6 +79,7 @@ define([
         state.boards[index] = board;
         gameStateStream.push(state);
     });
+    var boardChangedStream = boardStateStream.pluck('id').distinct();
 
     setTimeout(function() {
         gameStateStream.push(state);
@@ -176,7 +178,9 @@ define([
         return image;
     });
 
-    var imageDimensionStream = imagesStream.map(function (image) {
+    var imageDimensionStream = imagesStream.filter(function(image) {
+        return image.width;
+    }).map(function (image) {
         return {
             width: image.width,
             height: image.height
@@ -201,7 +205,7 @@ define([
     draggableEndStream.on(onDragSetTargetPosition);
     //var draggableThumbSizeStream = draggableAllStream.map();
 
-    var draggableThumbSizeStream = Stream.when([
+    var draggableThumbSizeStream = Stream.whenReset(boardChangedStream, [
         imageDimensionStream,
         draggableAllStream
     ]).mapApply(mapThumbDimensionForCanvas);
@@ -223,7 +227,7 @@ define([
         thumbContext.putImageData(imageData, 0, 0);
     });
 
-    Stream.when([
+    Stream.whenReset(boardChangedStream, [
         boardStateDiffsStream,
         draggableEndStream
     ]).onApply(function (diffs, e) {

@@ -26,6 +26,7 @@ define([
     './stream/fromElement',
     './stream/fromValue',
     './stream/domDiffWith',
+    './stream/whenReset',
     './stream/toElementProp'
 ], function(
     Stream,
@@ -55,6 +56,7 @@ define([
     fromElement,
     fromValue,
     domDiffWith,
+    whenReset,
     toElementProp
 ) {
     'use strict';
@@ -153,6 +155,7 @@ define([
     Stream.fromValue = fromValue;
     Stream.both = both;
     Stream.when = when;
+    Stream.whenReset = whenReset;
     //Stream.noop = noop;
     Stream.merge = merge;
     Stream.timeout = timeout;

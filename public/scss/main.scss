@@ -295,6 +295,7 @@ a.btn {
     position: relative;
     width: $thumb-width;
     height: $thumb-height;
+    overflow: hidden;
 
     &.btn {
         @include thumbFont();
@@ -351,7 +352,6 @@ a.btn {
         .tile {
             width: 150px;
             height: 150px;
-            overflow: hidden;
         }
     }
 }

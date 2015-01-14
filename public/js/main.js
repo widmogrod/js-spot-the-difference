@@ -219,7 +219,7 @@ define([
         draggableThumbSizeStream,
         imageDataStream
     ]).onApply(function (data, imageData) {
-        var thumbCanvas = document.querySelector('canvas[data-context="diff"][data-id="' + data.id + '"]');
+        var thumbCanvas = document.querySelector('canvas[data-context="thumb"][data-id="' + data.id + '"]');
         thumbCanvas.width = data.width;
         thumbCanvas.height = data.height;
 
@@ -232,7 +232,7 @@ define([
         draggableEndStream
     ]).onApply(function (diffs, e) {
         var id = parseInt(e.target.element.getAttribute('data-id'));
-        var thumbCanvas = document.querySelector('canvas[data-context="diff"][data-id="' + id + '"]');
+        var thumbCanvas = document.querySelector('canvas[data-context="thumb"][data-id="' + id + '"]');
 
         diffs.filter(function (diff) {
             return diff.id === id;
@@ -244,6 +244,55 @@ define([
             };
         });
     });
+
+    var boardDiffsLastIndexStream = boardStateLastStream.pluck('diffsLastIndex').distinct();
+
+    var recentlyAddedDiffStream = Stream.whenReset(boardChangedStream, [
+        boardStateDiffsStream.filter(function(diffs) {
+            return diffs.length;
+        }),
+        boardDiffsLastIndexStream
+    ]).mapApply(function(diffs, diffsLastIndex) {
+        return Stream.fromArray(diffs).filter(function(diff) {
+            return diff.id === diffsLastIndex
+        });
+    }).concat();
+
+    Stream.whenReset(boardChangedStream, [
+        recentlyAddedDiffStream,
+        imageDimensionStream
+    ]).mapApply(function(diff, dimensions) {
+        var element = document.querySelector('div[data-context="diff"][data-id="' + diff.id + '"]');
+        var a = element.getBoundingClientRect();
+        var b = element.parentNode.getBoundingClientRect();
+        var r = Math.round;
+
+        // Board to canvas proportions
+        var widthProportion = r(b.width) / (dimensions.width / 2);
+        var heightProportion = r(b.height) / dimensions.height;
+
+        // Relative position from point (0,0)
+        var relativeX = r(a.left) - r(b.left);
+        var relativeY = r(a.top) - r(b.top);
+
+        return {
+            // Thumbnail params
+            thumb: {
+                x: r(relativeX / widthProportion),
+                y: r(relativeY / heightProportion),
+                width: r(r(a.width) / widthProportion),
+                height: r(r(a.height) / heightProportion)
+            },
+            // Diff div params
+            diff: {
+                left: relativeX / r(b.width) * 100,
+                top: relativeY / r(b.height) * 100,
+                width: r(a.width),
+                height: r(a.height)
+            }
+        };
+    });
+
 
 
     // Update board thumbnails

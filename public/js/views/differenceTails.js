@@ -6,6 +6,7 @@ define(['../dom/el'], function (el) {
             return el('div', {
                 class: 'difference',
                 draggable: 'true',
+                'data-context': 'diff',
                 'data-id': diff.id,
                 style: 'top:' + diff.percent.top + '%; left:' + diff.percent.left + '%'
             });
